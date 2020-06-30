@@ -20,7 +20,8 @@ export const Default = () => ({
       price="0.025238 BTC"
       usdPrice=243.52
       :expirationTimestamp="time"
-      creq=120
+      creq=200
+      liquidationThresh=120
       daiBalance="100000000000000000000"
       synthBalance="0"/>
   </div>
