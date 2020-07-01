@@ -109,7 +109,13 @@
                 </div>
             </div>
             <div id="cratio">Collateralization Ratio</div>
-            <b-progress type="is-success" :value="10" show-value></b-progress>
+            <b-progress :value="cratio" :type="progressColor" :max="creq" show-value></b-progress>
+            <b-message v-if="progressColor === 'is-danger'" title="Insufficient Collateral" type="is-danger" :closable="false">
+            Your collateral ratio is below the liquidation threshold ({{liquidationThresh}}%)
+            </b-message>
+            <b-message v-if="progressColor === 'is-warning'" title="Insufficient Collateral" type="is-warning" :closable="false">
+            Your collateral ratio is below the collateral requirement ({{creq}}%)
+            </b-message>
             <b-button id="mint-button" type="is-primary">Mint {{name}}</b-button>
         </section>
     </div>
@@ -119,13 +125,24 @@
 import { ethers } from 'ethers';
 export default {
   name: 'Mint',
-  props:['name', 'priceFeed', 'price', 'usdPrice', 'expirationTimestamp', 'creq', 'daiBalance', 'synthBalance', 'liquidationThresh'],
+  props:['name', 'priceFeed', 'price', 'usdPrice', 'expirationTimestamp', 'creq', 'daiBalance', 'synthBalance', 'liquidationThresh', 'cratio'],
   methods:{
       timeFormat (timestamp) {
           return (new Date(timestamp)).toUTCString()
       },
       balanceFormat(baseUnit) {
           return ethers.utils.formatEther(baseUnit)
+      }
+  },
+  computed: {
+      progressColor () {
+          if(this.cratio >= this.creq) {
+              return 'is-success'
+          } else if(this.cratio >= this.liquidationThresh) {
+              return "is-warning"
+          } else {
+              return "is-danger"
+          }
       }
   }
 }
