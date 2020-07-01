@@ -12,7 +12,7 @@
                     Current Collateral: {{balanceFormat(currentCollateral)}} DAI
                 </div>
                 <div class="is-pulled-right">
-                    $0 USD
+                    ${{currentCollateralUsd}} USD
                 </div>
             </div>
             <div id="cratio">Collateralization Ratio</div>
@@ -32,7 +32,7 @@
 import { ethers } from 'ethers';
 export default {
   name: 'Withdraw',
-  props:['name', 'currentCollateral', 'cratio', 'creq', 'liquidationThresh'],
+  props:['name', 'currentCollateral', 'cratio', 'creq', 'liquidationThresh', 'currentCollateralUsd'],
   methods:{
       balanceFormat(baseUnit) {
           return ethers.utils.formatEther(baseUnit)
