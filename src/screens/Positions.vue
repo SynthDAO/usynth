@@ -31,15 +31,21 @@
         </b-table-column>
       </template>
     </b-table>
-    <b-button class="button" size="is-medium" type="is-primary">Mint a Synth</b-button>
+    <b-dropdown aria-role="list">
+        <button class="button is-primary" size="is-medium" slot="trigger">
+            Mint a Synth
+        </button>
+        <b-dropdown-item v-for="(synth, key) in synths" :key="key" @click='showMintModal(key)' aria-role="listitem">{{key}}</b-dropdown-item>
+    </b-dropdown>
     <b-button class="button" size="is-medium">Create New Synth</b-button>
   </div>
 </template>
 
 <script>
+import Mint from '../components/Mint';
 export default {
   name: 'Positions',
-  props:['positions'],
+  props:['positions', 'synths'],
   data () {
     return {
       columns: [
@@ -68,6 +74,26 @@ export default {
             label: 'Pending',
         }
       ]
+    }
+  },
+  methods:{
+    showMintModal(synthKey) {
+      const synth = this.synths[synthKey]
+      this.$buefy.modal.open({
+        parent: this,
+        component: Mint,
+        trapFocus: true,
+        fullScreen:true,
+        customClass:"modal",
+        props:{
+          ...synth
+        },
+        events:{
+          mint({collateral, synth}){
+            alert(collateral, synth)
+          }
+        }
+      })
     }
   }
 }

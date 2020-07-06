@@ -87,7 +87,7 @@
 
         <section>
             <b-field label="Deposit Collateral">
-                <b-input value="" placeholder="Deposit DAI"></b-input>
+                <b-input v-model="collateralAmount" placeholder="Deposit DAI"></b-input>
             </b-field>
             <div class="balance">
                 <div class="is-pulled-left">
@@ -98,7 +98,7 @@
                 </div>
             </div>
             <b-field label="Mint Synth">
-                <b-input value="" :placeholder="'Mint ' + name"></b-input>
+                <b-input v-model="synthAmount" :placeholder="'Mint ' + name"></b-input>
             </b-field>
             <div class="balance">
                 <div class="is-pulled-left">
@@ -116,7 +116,7 @@
             <b-message v-if="progressColor === 'is-warning'" title="Insufficient Collateral" type="is-warning" :closable="false">
             Your collateral ratio is below the collateral requirement ({{creq}}%)
             </b-message>
-            <b-button id="mint-button" type="is-primary">Mint {{name}}</b-button>
+            <b-button @click="mint" id="mint-button" type="is-primary">Mint {{name}}</b-button>
         </section>
     </div>
 </template>
@@ -126,12 +126,24 @@ import { ethers } from 'ethers';
 export default {
   name: 'Mint',
   props:['name', 'priceFeed', 'price', 'usdPrice', 'expirationTimestamp', 'creq', 'daiBalance', 'synthBalance', 'liquidationThresh', 'cratio'],
+  data:()=>{
+      return {
+          collateralAmount:"",
+          synthAmount:""
+      }
+  },
   methods:{
       timeFormat (timestamp) {
           return (new Date(timestamp)).toUTCString()
       },
       balanceFormat(baseUnit) {
           return ethers.utils.formatEther(baseUnit)
+      },
+      mint() {
+        this.$emit('mint', {
+            collateral:this.collateralAmount,
+            synth:this.synthAmount
+        })
       }
   },
   computed: {
@@ -152,7 +164,6 @@ export default {
 .body {
     max-width:400px;
     margin:auto;
-
 }
 .item {
     margin-bottom:20px;

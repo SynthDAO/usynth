@@ -21,6 +21,11 @@ $colors: (
     "twitter": ($twitter, $twitter-invert)
 );
 
+// Modal x button
+.modal .modal-close {
+    background:black;
+}
+
 // Links
 $link: $primary;
 $link-invert: $primary-invert;

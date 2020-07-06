@@ -21,7 +21,7 @@ export default {
       await window.ethereum.enable()
       const network = window.ethereum.networkVersion === '1'? 'Mainnet': window.ethereum.networkVersion === '42'? 'Kovan': undefined
       if(network) {
-        window.ethereum.autoRefreshOnNetworkChange = true;
+        window.undefinedethereum.autoRefreshOnNetworkChange = true;
         let wallet = (new ethers.providers.Web3Provider(window.ethereum)).getSigner()
         this.$store.commit('auth', {
           network,
