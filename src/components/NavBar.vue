@@ -24,10 +24,23 @@
 
         <template slot="end">
             <b-navbar-item tag="div">
-                <div class="buttons">
-                    <a class="button is-primary">
+                <div v-if="!authed" class="buttons">
+                    <a @click="$emit('connect')" class="button is-primary">
                         <strong>Connect Wallet</strong>
                     </a>
+                </div>
+                <div v-else>
+                    <div id="address">
+                    <b-tag
+                        type="is-success"
+                        rounded>
+                        Connected
+                    </b-tag>
+                    {{shortAddress}}
+                    </div>
+                    <div id="network">
+                    {{network}}
+                    </div>
                 </div>
             </b-navbar-item>
         </template>
@@ -38,11 +51,24 @@
 <script>
 export default {
   name: 'NavBar',
+  props:['authed', 'address', 'network'],
+  computed: {
+      shortAddress () {
+          return this.address.slice(0, 6) + '...' + this.address.slice(38, 42)
+      }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 #logo {
     height:100%;
+}
+#address {
+    font-size:15px;
+}
+#network {
+    float:right;
+    font-size:13px;
 }
 </style>

@@ -5,11 +5,24 @@ export default {
   component: NavBar,
 };
 
-export const Default = () => ({
+export const Unauthed = () => ({
   components: { NavBar },
   template: `
   <div class="container">
-    <NavBar />
+    <NavBar :authed="false"/>
+  </div>
+  
+  `
+});
+
+export const Authed = () => ({
+  components: { NavBar },
+  template: `
+  <div class="container">
+    <NavBar
+    :authed="true"
+    address="0x0000000000000000000000000000000000000001"
+    network="Kovan"/>
   </div>
   
   `
