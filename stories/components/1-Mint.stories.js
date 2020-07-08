@@ -24,7 +24,7 @@ export const AboveCollateralRequirement = () => ({
       liquidationThresh=120
       daiBalance="100000000000000000000"
       synthBalance="0"
-      cratio="300"/>
+      />
   </div>
   
   `
@@ -49,7 +49,7 @@ export const BelowCollateralRequirement = () => ({
       liquidationThresh=120
       daiBalance="100000000000000000000"
       synthBalance="0"
-      cratio="150"/>
+      />
   </div>
   
   `
@@ -74,7 +74,7 @@ export const BelowLiquidationThreshold = () => ({
       liquidationThresh=120
       daiBalance="100000000000000000000"
       synthBalance="0"
-      cratio="100"/>
+      />
   </div>
   
   `

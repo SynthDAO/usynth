@@ -20,8 +20,7 @@ export const WithSynths = () => ({
           creq:200,
           liquidationThresh:120,
           daiBalance:"100000000000000000000",
-          synthBalance:"0",
-          cratio:"300"
+          synthBalance:"0"
         }
       }
     }

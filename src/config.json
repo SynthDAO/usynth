@@ -1,0 +1,8 @@
+{
+    "kovan":{
+        "daiAddress":"0xbF7A7169562078c96f0eC1A8aFD6aE50f12e5A99",
+        "synths":{
+            "COMP/USD":"0x3Ce65E51FE0eDeEde01B9DDADd8990308e314d97"
+        }
+    }
+}
