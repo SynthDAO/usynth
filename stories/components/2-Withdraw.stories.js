@@ -12,7 +12,6 @@ export const AboveCollateralRequirement = () => ({
     <Withdraw 
     name="ETHBTC-AUG20"
     currentCollateral="100000000000000000000"
-    currentCollateralUsd=101
     cratio="300"
     creq=200
     liquidationThresh=120 />
@@ -28,7 +27,6 @@ export const BelowCollateralRequirement = () => ({
     <Withdraw 
     name="ETHBTC-AUG20"
     currentCollateral="100000000000000000000"
-    currentCollateralUsd=101
     cratio="150"
     creq=200
     liquidationThresh=120 />
@@ -44,7 +42,6 @@ export const BelowLiquidationThreshold = () => ({
     <Withdraw 
     name="ETHBTC-AUG20"
     currentCollateral="100000000000000000000"
-    currentCollateralUsd=101
     cratio="100"
     creq=200
     liquidationThresh=120 />

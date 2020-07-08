@@ -25,8 +25,6 @@
             <div class="level-right">
                 <div class="level-item is-pulled-right">
                 {{price}}
-                <br>
-                ${{usdPrice}} USD
                 </div>
             </div>
         </div>
@@ -93,9 +91,6 @@
                 <div class="is-pulled-left">
                     Balance: {{balanceFormat(daiBalance)}} DAI
                 </div>
-                <div class="is-pulled-right">
-                    $0 USD
-                </div>
             </div>
             <b-field label="Mint Synth">
                 <b-input v-model="synthAmount" :placeholder="'Mint ' + name"></b-input>
@@ -103,9 +98,6 @@
             <div class="balance">
                 <div class="is-pulled-left">
                     Balance: {{balanceFormat(synthBalance)}} {{name}}
-                </div>
-                <div class="is-pulled-right">
-                    $0 USD
                 </div>
             </div>
             <div id="cratio">Collateralization Ratio</div>
@@ -122,7 +114,7 @@
 import { ethers } from 'ethers';
 export default {
   name: 'Mint',
-  props:['name', 'priceFeed', 'price', 'usdPrice', 'expirationTimestamp', 'creq', 'daiBalance', 'synthBalance', 'liquidationThresh'],
+  props:['name', 'priceFeed', 'price', 'expirationTimestamp', 'creq', 'daiBalance', 'synthBalance', 'liquidationThresh'],
   data:()=>{
       return {
           collateralAmount:"",

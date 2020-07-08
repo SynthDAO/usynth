@@ -18,7 +18,6 @@ export const AboveCollateralRequirement = () => ({
       name="ETHBTC-AUG20" 
       priceFeed="ETH/BTC"
       price="0.025238 BTC"
-      usdPrice=243.52
       :expirationTimestamp="time"
       creq=200
       liquidationThresh=120
@@ -43,7 +42,6 @@ export const BelowCollateralRequirement = () => ({
       name="ETHBTC-AUG20" 
       priceFeed="ETH/BTC"
       price="0.025238 BTC"
-      usdPrice=243.52
       :expirationTimestamp="time"
       creq=200
       liquidationThresh=120
@@ -68,7 +66,6 @@ export const BelowLiquidationThreshold = () => ({
       name="ETHBTC-AUG20" 
       priceFeed="ETH/BTC"
       price="0.025238 BTC"
-      usdPrice=243.52
       :expirationTimestamp="time"
       creq=200
       liquidationThresh=120
