@@ -146,7 +146,7 @@ export default {
       cratio () {
           if(this.collateralAmount === "" || this.synthAmount === "") return 0
           if(isNaN(this.collateralAmount) || isNaN(this.synthAmount)) return 0
-          return this.collateralAmount / (this.synthAmount * (this.price.slice(0, -4))) * 100 // TODO: Use big numbers
+          return this.collateralAmount / (this.synthAmount * this.price) * 100 // TODO: Use big numbers
       }
   }
 }

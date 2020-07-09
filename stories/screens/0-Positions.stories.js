@@ -14,7 +14,7 @@ export const WithSynths = () => ({
         ETHBTC:{
           name:"ETHBTC-AUG20",
           priceFeed:"ETH/BTC",
-          price:"0.025238 BTC",
+          price:"0.025238",
           expirationTimestamp:Date.now() + 10000000,
           creq:200,
           liquidationThresh:120,

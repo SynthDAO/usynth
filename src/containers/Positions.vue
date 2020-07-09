@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Positions/>
+    <Positions :synths="this.$store.state.synths"/>
   </div>
 </template>
 

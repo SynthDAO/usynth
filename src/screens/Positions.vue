@@ -32,12 +32,11 @@
       </template>
     </b-table>
     <b-dropdown aria-role="list">
-        <button class="button is-primary" size="is-medium" slot="trigger">
+        <button :disabled="synths.length === 0" class="button is-primary" size="is-medium" slot="trigger">
             Mint a Synth
         </button>
         <b-dropdown-item v-for="(synth, key) in synths" :key="key" @click='showMintModal(key)' aria-role="listitem">{{key}}</b-dropdown-item>
     </b-dropdown>
-    <b-button class="button" size="is-medium">Create New Synth</b-button>
   </div>
 </template>
 

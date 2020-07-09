@@ -8,13 +8,15 @@ export default new Vuex.Store({
     authed:false,
     address:"",
     network:"",
-    wallet:{}
+    wallet:{},
+    synths:[]
   },
   mutations: {
-    auth (state, {address, network, wallet}) {
+    auth (state, {address, network, wallet, synths}) {
       state.address = address
       state.network = network
       state.wallet = wallet
+      state.synths = synths
       state.authed = true
     }
   },
