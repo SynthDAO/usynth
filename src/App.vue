@@ -32,7 +32,7 @@ export default {
         let daiContract = new ethers.Contract(config[network.toLowerCase()].daiAddress, daiAbi, wallet)
         let daiBalance = (await daiContract.balanceOf(window.ethereum.selectedAddress)).toString()
         let synths = {}
-        Object.keys(config[network.toLowerCase()].synths).forEach(async (synth)=>{
+        for (let synth in config[network.toLowerCase()].synths) {
           let contract = new ethers.Contract(config[network.toLowerCase()].synths[synth], empAbi, wallet)
           let synthAddress = await contract.tokenCurrency()
           let tokenContract = new ethers.Contract(synthAddress, daiAbi, wallet) // DAI abi includes the necessary ERC20 interface
@@ -42,11 +42,11 @@ export default {
           let totalTokensOutstanding = (await contract.totalTokensOutstanding()).toString()
           let minSponsorTokens = (await contract.minSponsorTokens()).toString()
           let GCR = BigNumber(cumulativeFeeMultiplier).shiftedBy(-18).times(rawTotalPositionCollateral).div(totalTokensOutstanding).toFixed()
-          let creq = BigNumber(GCR).times(100).toFixed()
+          let price = await getPairPrice(synth.replace('/', '-').toLowerCase())
+          let creq = BigNumber(GCR).div(price).times(100).toFixed(4)
           let expirationTimestamp = (await contract.expirationTimestamp()).toNumber()
-          let price = await getPairPrice(synth.replace('/', '').toLowerCase())
           let priceFeed = ethers.utils.parseBytes32String(await contract.priceIdentifier())
-          let liquidationThreshold = BigNumber((await contract.collateralRequirement()).toString()).shiftedBy(-16).toFixed()
+          let liquidationThresh = BigNumber((await contract.collateralRequirement()).toString()).shiftedBy(-16).toFixed()
           synths[synth] = {
             contract,
             tokenContract,
@@ -56,10 +56,10 @@ export default {
             creq,
             price,
             priceFeed,
-            liquidationThreshold,
+            liquidationThresh,
             expirationTimestamp
           }
-        })
+        }
         this.$store.commit('auth', {
           daiContract,
           daiBalance,

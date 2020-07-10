@@ -8,15 +8,18 @@ export default new Vuex.Store({
     authed:false,
     address:"",
     network:"",
+    daiBalance:"",
     wallet:{},
-    synths:[]
+    synths:{}
   },
   mutations: {
-    auth (state, {address, network, wallet, synths}) {
+    auth (state, {address, network, wallet, synths, daiBalance, daiContract}) {
       state.address = address
       state.network = network
       state.wallet = wallet
       state.synths = synths
+      state.daiBalance = daiBalance
+      state.daiContract = daiContract
       state.authed = true
     }
   },

@@ -19,7 +19,7 @@
         <div class="level item">
             <div class="level-left">
                 <div class="level-item">
-                <strong>Current Price</strong>
+                <strong>Current Index</strong>
                 </div>
             </div>
             <div class="level-right">
@@ -58,7 +58,7 @@
         <div class="level item">
             <div class="level-left">
                 <div class="level-item">
-                <strong>Collateral Requirement</strong>
+                <strong>Minimum Collateral</strong>
                 </div>
             </div>
             <div class="level-right">
@@ -77,6 +77,19 @@
             <div class="level-right">
                 <div class="level-item is-pulled-right">
                 {{liquidationThresh}}%
+                </div>
+            </div>
+        </div>
+
+        <div class="level item">
+            <div class="level-left">
+                <div class="level-item">
+                <strong>Minimum Minted Tokens</strong>
+                </div>
+            </div>
+            <div class="level-right">
+                <div class="level-item is-pulled-right">
+                {{balanceFormat(minSponsorTokens)}}
                 </div>
             </div>
         </div>
@@ -101,11 +114,11 @@
                 </div>
             </div>
             <div id="cratio">Collateralization Ratio</div>
-            <b-progress :value="cratio" :type="progressColor" :max="creq" show-value></b-progress>
+            <b-progress :value="cratio" :type="progressColor" :max="Number(creq)" show-value></b-progress>
             <b-message v-if="cratio < creq && cratio > 0" title="Insufficient Collateral" type="is-danger" :closable="false">
-            Your collateral ratio is below the collateral requirement ({{creq}}%)
+            Your collateral ratio is below the minimum collateral ({{creq}}%)
             </b-message>
-            <b-button :disabled="cratio < creq" @click="mint" id="mint-button" type="is-primary">Mint {{name}}</b-button>
+            <b-button :disabled="disabled" @click="mint" id="mint-button" type="is-primary">Mint {{name}}</b-button>
         </section>
     </div>
 </template>
@@ -114,7 +127,7 @@
 import { ethers } from 'ethers';
 export default {
   name: 'Mint',
-  props:['name', 'priceFeed', 'price', 'expirationTimestamp', 'creq', 'daiBalance', 'synthBalance', 'liquidationThresh'],
+  props:['name', 'priceFeed', 'price', 'expirationTimestamp', 'creq', 'daiBalance', 'synthBalance', 'liquidationThresh', 'minSponsorTokens'],
   data:()=>{
       return {
           collateralAmount:"",
@@ -123,7 +136,7 @@ export default {
   },
   methods:{
       timeFormat (timestamp) {
-          return (new Date(timestamp)).toUTCString()
+          return (new Date(timestamp*1000)).toUTCString()
       },
       balanceFormat(baseUnit) {
           return ethers.utils.formatEther(baseUnit)
@@ -131,8 +144,10 @@ export default {
       mint() {
         this.$emit('mint', {
             collateral:this.collateralAmount,
-            synth:this.synthAmount
+            synth:this.synthAmount,
+            synthName:this.name
         })
+        this.$emit('close')
       }
   },
   computed: {
@@ -147,6 +162,15 @@ export default {
           if(this.collateralAmount === "" || this.synthAmount === "") return 0
           if(isNaN(this.collateralAmount) || isNaN(this.synthAmount)) return 0
           return this.collateralAmount / (this.synthAmount * this.price) * 100 // TODO: Use big numbers
+      },
+      disabled () {
+          if(this.cratio < this.creq) return true
+          if(isNaN(this.collateralAmount) || isNaN(this.synthAmount)) return true
+          if(this.synthAmount < parseInt(this.balanceFormat(this.minSponsorTokens))) return true
+          if(this.collateralAmount > parseInt(this.balanceFormat(this.daiBalance))) return true
+          if(this.synthAmount.length === 0 || this.collateralAmount.length === 0) return true
+          if(this.synthAmount === 0 || this.collateralAmount === 0) return true
+          return false
       }
   }
 }

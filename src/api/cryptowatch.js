@@ -1,11 +1,10 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://api.cryptowat.ch/',
+    baseURL: 'https://api.coinbase.com/v2',
 });
 
 export const getPairPrice = async (pair) => {
-    pair = pair.toLowerCase()
-    const res = await api.get('markets/coinbase/'+pair+'/price')
-    return res.data.result.price
+    const res = await api.get('prices/'+pair+'/spot')
+    return res.data.data.amount
 }

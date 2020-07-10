@@ -32,7 +32,7 @@
       </template>
     </b-table>
     <b-dropdown aria-role="list">
-        <button :disabled="synths.length === 0" class="button is-primary" size="is-medium" slot="trigger">
+        <button :disabled="Object.keys(synths).length === 0" class="button is-primary" size="is-medium" slot="trigger">
             Mint a Synth
         </button>
         <b-dropdown-item v-for="(synth, key) in synths" :key="key" @click='showMintModal(key)' aria-role="listitem">{{key}}</b-dropdown-item>
@@ -44,7 +44,7 @@
 import Mint from '../components/Mint';
 export default {
   name: 'Positions',
-  props:['positions', 'synths'],
+  props:['positions', 'synths', 'daiBalance'],
   data () {
     return {
       columns: [
@@ -78,6 +78,9 @@ export default {
   methods:{
     showMintModal(synthKey) {
       const synth = this.synths[synthKey]
+      synth.daiBalance = this.daiBalance
+      synth.name = synthKey
+      const self = this
       this.$buefy.modal.open({
         parent: this,
         component: Mint,
@@ -88,8 +91,8 @@ export default {
           ...synth
         },
         events:{
-          mint({collateral, synth}){
-            alert(collateral, synth)
+          mint({collateral, synth, synthName}){
+            self.$emit('mint', {collateral, synth, synthName})
           }
         }
       })
