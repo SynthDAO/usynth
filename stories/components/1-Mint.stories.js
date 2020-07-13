@@ -1,5 +1,5 @@
 import Mint from '../../src/components/Mint.vue';
-
+import { ethers } from 'ethers'
 export default {
   title: 'Mint',
   component: Mint,
@@ -23,6 +23,7 @@ export const AboveCollateralRequirement = () => ({
       liquidationThresh=120
       daiBalance="100000000000000000000"
       synthBalance="0"
+      minSponsorTokens="1000000000000000000"
       />
   </div>
   
@@ -47,6 +48,7 @@ export const BelowCollateralRequirement = () => ({
       liquidationThresh=120
       daiBalance="100000000000000000000"
       synthBalance="0"
+      minSponsorTokens="1000000000000000000"
       />
   </div>
   
@@ -71,6 +73,7 @@ export const BelowLiquidationThreshold = () => ({
       liquidationThresh=120
       daiBalance="100000000000000000000"
       synthBalance="0"
+      minSponsorTokens="1000000000000000000"
       />
   </div>
   

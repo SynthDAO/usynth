@@ -19,7 +19,8 @@ export const WithSynths = () => ({
           creq:200,
           liquidationThresh:120,
           daiBalance:"100000000000000000000",
-          synthBalance:"0"
+          synthBalance:"0",
+          minSponsorTokens:"1000000000000000000"
         }
       }
     }
@@ -34,7 +35,7 @@ export const WithPositions = () => ({
   components: { Positions, NavBar },
   template: `
   <div class="container">
-  <NavBar/><Positions :positions="positions" />
+  <NavBar/><Positions :synths="{}" :positions="positions" />
   </div>`,
   data: () => {
     return {
