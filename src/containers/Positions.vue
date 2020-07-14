@@ -36,7 +36,8 @@ export default {
       const allowance = await daiContract.allowance(this.$store.state.address, synthAddress)
       const MAX_UINT256 = ethers.BigNumber.from(2).pow(256).sub(1)
       if(allowance.lt(weiCollateral)) {
-        await daiContract.approve(synthAddress, MAX_UINT256)
+        const approveTx = await daiContract.approve(synthAddress, MAX_UINT256)
+        await approveTx.wait()
       }
       const synthContract = this.$store.state.synths[synthName].contract
       const tx = await synthContract.create([weiCollateral], [weiSynth])
