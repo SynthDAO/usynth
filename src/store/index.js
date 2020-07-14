@@ -11,7 +11,7 @@ export default new Vuex.Store({
     daiBalance:"",
     wallet:{},
     synths:{},
-    positions:{}
+    positions:[]
   },
   mutations: {
     auth (state, {address, network, wallet}) {

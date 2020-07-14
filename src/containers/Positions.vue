@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Positions @mint="mint" :synths="this.$store.state.synths" :daiBalance="this.$store.state.daiBalance"/>
+    <Positions @mint="mint" :positions="positions" :synths="this.$store.state.synths" :daiBalance="this.$store.state.daiBalance"/>
   </div>
 </template>
 
@@ -13,6 +13,19 @@ export default {
   name: 'Home',
   components: {
     Positions
+  },
+  computed:{
+    positions() {
+      return this.$store.state.positions.map((position) => {
+        position.amount = position.tokensOutstanding
+        position.collateral = position.rawCollateral
+        const synth = this.$store.state.synths[position.name]
+        position.creq = synth.creq
+        position.cratio = position.collateral.div(position.amount.mul(parseInt(synth.price))).mul(100).toString()
+        position.pending = position.withdrawalRequestAmount.gt(0)? "Withdrawal: " + ethers.utils.formatEther(position.withdrawalRequestAmount) + " DAI": "none"
+        return position
+      })      
+    }
   },
   methods:{
     async mint({collateral, synth, synthName}) {

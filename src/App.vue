@@ -61,10 +61,27 @@ export default {
             expirationTimestamp
           }
         }
+        let positions = []
+        for (let synth in synths) {
+          let contractPositions = await synths[synth].contract.positions(address)
+          for (let i = 0; i < contractPositions.tokensOutstanding.length; i++) {
+            if(contractPositions.tokensOutstanding[i].gt(0)) {
+              positions.push({
+                name:synth,
+                tokensOutstanding: contractPositions.tokensOutstanding[i],
+                requestPassTimestamp:contractPositions.requestPassTimestamp,
+                withdrawalRequestAmount:contractPositions.withdrawalRequestAmount[i],
+                rawCollateral:contractPositions.rawCollateral[i],
+                transferPositionRequestPassTimestamp:contractPositions.transferPositionRequestPassTimestamp
+              })
+            }
+          }
+        }
         this.$store.commit('init', {
           daiContract,
           daiBalance,
-          synths
+          synths,
+          positions
         })
       } else {
         this.$buefy.dialog.alert({

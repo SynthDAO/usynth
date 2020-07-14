@@ -12,16 +12,16 @@
             {{ props.row.name }}
         </b-table-column>
         <b-table-column field="amount" label="Amount">
-            {{ props.row.amount }}
+            {{ balanceFormat(props.row.amount) }}
         </b-table-column>
         <b-table-column field="collateral" label="Collateral">
-            {{ props.row.collateral }} DAI
+            {{ balanceFormat(props.row.collateral) }} DAI
         </b-table-column>
         <b-table-column field="cratio" label="C. Ratio">
-            {{ props.row.cratio }}
+            {{ props.row.cratio }}%
         </b-table-column>
         <b-table-column field="creq" label="C. Req.">
-            {{ props.row.creq }}
+            {{ props.row.creq }}%
         </b-table-column>
         <b-table-column field="pending" label="Pending">
             {{ props.row.pending }}
@@ -42,6 +42,8 @@
 
 <script>
 import Mint from '../components/Mint';
+import { ethers } from 'ethers'
+
 export default {
   name: 'Positions',
   props:['positions', 'synths', 'daiBalance'],
@@ -96,7 +98,10 @@ export default {
           }
         }
       })
-    }
+    },
+    balanceFormat(baseUnit) {
+      return ethers.utils.formatEther(baseUnit)
+    },
   }
 }
 </script>
