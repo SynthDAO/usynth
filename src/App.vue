@@ -102,4 +102,7 @@ export default {
 
 <style lang="scss">
 @import "./styles.scss";
+#app {
+  padding-bottom:50px;
+}
 </style>

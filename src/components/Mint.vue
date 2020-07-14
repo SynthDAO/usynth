@@ -180,6 +180,8 @@ export default {
 .body {
     max-width:400px;
     margin:auto;
+    padding-top:50px;
+    padding-bottom:50px;
 }
 .item {
     margin-bottom:20px;
