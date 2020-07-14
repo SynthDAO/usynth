@@ -11,6 +11,7 @@
             </b-navbar-item>
         </template>
         <template slot="start">
+            <!--
             <b-navbar-item href="/" >
                 Positions
             </b-navbar-item>
@@ -19,7 +20,8 @@
             </b-navbar-item>
             <b-navbar-item href="/pool">
                 Pool
-            </b-navbar-item>
+            </b-navbar-item
+            -->
         </template>
 
         <template slot="end">
