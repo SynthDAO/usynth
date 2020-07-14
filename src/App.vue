@@ -29,6 +29,7 @@ export default {
         window.ethereum.autoRefreshOnNetworkChange = true;
         let wallet = (new ethers.providers.Web3Provider(window.ethereum)).getSigner()
         let address = window.ethereum.selectedAddress
+        this.$store.commit('auth', {address, network, wallet})
         let daiContract = new ethers.Contract(config[network.toLowerCase()].daiAddress, daiAbi, wallet)
         let daiBalance = (await daiContract.balanceOf(window.ethereum.selectedAddress)).toString()
         let synths = {}
@@ -60,12 +61,9 @@ export default {
             expirationTimestamp
           }
         }
-        this.$store.commit('auth', {
+        this.$store.commit('init', {
           daiContract,
           daiBalance,
-          network,
-          address,
-          wallet,
           synths
         })
       } else {
