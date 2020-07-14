@@ -83,6 +83,7 @@ export default {
           synths,
           positions
         })
+        this.watchBalances()
       } else {
         this.$buefy.dialog.alert({
             title: 'Invalid Network',
@@ -95,6 +96,11 @@ export default {
             ariaModal: true
         })
       }
+    },
+    watchBalances () {
+      setInterval(async () => {
+        this.$store.dispatch('updateBalances')
+      }, 5000) // 5 seconds
     }
   }
 }

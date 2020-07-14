@@ -9,6 +9,7 @@ export default new Vuex.Store({
     address:"",
     network:"",
     daiBalance:"",
+    daiContract:undefined,
     wallet:{},
     synths:{},
     positions:[]
@@ -25,9 +26,28 @@ export default new Vuex.Store({
       state.daiBalance = daiBalance
       state.daiContract = daiContract
       state.positions = positions
+    },
+    updateBalances (state, {daiBalance, synthBalances}) {
+      state.daiBalance = daiBalance
+      let synths = Object.assign({}, state.synths)
+      for (let synth in synths) {
+        synths[synth].synthBalance = synthBalances[synth]
+      }
+      state.synths = synths
     }
   },
   actions: {
+    async updateBalances (context) {
+      const address = context.state.address;
+      const daiBalance = (await context.state.daiContract.balanceOf(address)).toString()
+      let synthBalances = {}
+      for (let synth in context.state.synths) {
+        const tokenContract = context.state.synths[synth].tokenContract
+        const synthBalance = (await tokenContract.balanceOf(address)).toString()
+        synthBalances[synth] = synthBalance
+      }
+      context.commit('updateBalances', {daiBalance, synthBalances})
+    }
   },
   modules: {
   }
