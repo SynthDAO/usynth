@@ -22,12 +22,22 @@ export default {
     NavBar
   },
   methods:{
+    until(conditionFunction) {
+
+      const poll = resolve => {
+        if(conditionFunction()) resolve();
+        else setTimeout(() => poll(resolve), 100);
+      }
+
+      return new Promise(poll);
+    },
     async connect() {
       await window.ethereum.enable()
       const network = window.ethereum.networkVersion === '1'? 'Mainnet': window.ethereum.networkVersion === '42'? 'Kovan': undefined
       if(network) {
         window.ethereum.autoRefreshOnNetworkChange = true;
         let wallet = (new ethers.providers.Web3Provider(window.ethereum)).getSigner()
+        await this.until(() => typeof window.ethereum.selectedAddress === 'string')
         let address = window.ethereum.selectedAddress
         this.$store.commit('auth', {address, network, wallet})
         let daiContract = new ethers.Contract(config[network.toLowerCase()].daiAddress, daiAbi, wallet)

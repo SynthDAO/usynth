@@ -56,7 +56,8 @@ export default {
   props:['authed', 'address', 'network'],
   computed: {
       shortAddress () {
-          return this.address.slice(0, 6) + '...' + this.address.slice(38, 42)
+          if(this.address) return this.address.slice(0, 6) + '...' + this.address.slice(38, 42)
+          return ""
       }
   }
 }
