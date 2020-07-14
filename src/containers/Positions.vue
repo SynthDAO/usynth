@@ -54,6 +54,9 @@ export default {
             win.focus();
           }
       })
+      await tx.wait(3)
+      this.$store.dispatch('updatePositions')
+      this.$store.dispatch('updateBalances')
     }
   }
 }

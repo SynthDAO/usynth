@@ -21,11 +21,10 @@ export default new Vuex.Store({
       state.wallet = wallet
       state.authed = true
     },
-    init (state, {synths, daiBalance, daiContract, positions}) {
+    init (state, {synths, daiBalance, daiContract}) {
       state.synths = synths
       state.daiBalance = daiBalance
       state.daiContract = daiContract
-      state.positions = positions
     },
     updateBalances (state, {daiBalance, synthBalances}) {
       state.daiBalance = daiBalance
@@ -34,6 +33,9 @@ export default new Vuex.Store({
         synths[synth].synthBalance = synthBalances[synth]
       }
       state.synths = synths
+    },
+    updatePositions (state, positions) {
+      state.positions = positions
     }
   },
   actions: {
@@ -47,6 +49,25 @@ export default new Vuex.Store({
         synthBalances[synth] = synthBalance
       }
       context.commit('updateBalances', {daiBalance, synthBalances})
+    },
+    async updatePositions (context) {
+      let positions = []
+      for (let synth in context.state.synths) {
+        let contractPositions = await context.state.synths[synth].contract.positions(context.state.address)
+        for (let i = 0; i < contractPositions.tokensOutstanding.length; i++) {
+          if(contractPositions.tokensOutstanding[i].gt(0)) {
+            positions.push({
+              name:synth,
+              tokensOutstanding: contractPositions.tokensOutstanding[i],
+              requestPassTimestamp:contractPositions.requestPassTimestamp,
+              withdrawalRequestAmount:contractPositions.withdrawalRequestAmount[i],
+              rawCollateral:contractPositions.rawCollateral[i],
+              transferPositionRequestPassTimestamp:contractPositions.transferPositionRequestPassTimestamp
+            })
+          }
+        }
+      }
+      context.commit('updatePositions', positions)
     }
   },
   modules: {
