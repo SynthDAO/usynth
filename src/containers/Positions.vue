@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Positions @mint="mint" :positions="positions" :synths="this.$store.state.synths" :daiBalance="this.$store.state.daiBalance"/>
+    <Positions @mint="mint" @withdraw="withdraw" :positions="positions" :synths="this.$store.state.synths" :daiBalance="this.$store.state.daiBalance"/>
   </div>
 </template>
 
@@ -43,6 +43,27 @@ export default {
       const tx = await synthContract.create([weiCollateral], [weiSynth])
       this.$buefy.snackbar.open({
           message: 'Your transaction has been submitted',
+          type: 'is-success',
+          position: 'is-top',
+          actionText: 'Check TX',
+          indefinite: true,
+          onAction: () => {
+            const prefix = this.$store.state.network === "Mainnet"? "": (this.$store.state.network.toLowerCase() + ".")
+            const url = `https://${prefix}etherscan.io/tx/${tx.hash}`
+            var win = window.open(url, '_blank');
+            win.focus();
+          }
+      })
+      await tx.wait(3)
+      this.$store.dispatch('updatePositions')
+      this.$store.dispatch('updateBalances')
+    },
+    async withdraw({collateral, synthName}) {
+      const weiCollateral = ethers.utils.parseUnits(collateral)
+      const synthContract = this.$store.state.synths[synthName].contract
+      const tx = await synthContract.withdraw([weiCollateral])
+      this.$buefy.snackbar.open({
+          message: 'Your withdrawal has been submitted',
           type: 'is-success',
           position: 'is-top',
           actionText: 'Check TX',

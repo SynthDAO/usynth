@@ -27,7 +27,14 @@
             {{ props.row.pending }}
         </b-table-column>
         <b-table-column field="action" label="Action">
-            <div class="position-action">mint</div> | <div class="position-action">withdraw</div> | <div class="position-action">trade</div>
+            <b-dropdown aria-role="list">
+              <button slot="trigger" slot-scope="{ active }">
+                  <b-icon :icon="active ? 'menu-up' : 'menu-down'"></b-icon>
+              </button>
+              <b-dropdown-item @click="showMintModal(props.row.name)" aria-role="listitem">Mint</b-dropdown-item>
+              <b-dropdown-item @click="showWithdrawModal(props.index)" aria-role="listitem">Withdraw</b-dropdown-item>
+              <b-dropdown-item aria-role="listitem">Trade</b-dropdown-item>
+          </b-dropdown>
         </b-table-column>
       </template>
     </b-table>
@@ -42,6 +49,7 @@
 
 <script>
 import Mint from '../components/Mint';
+import Withdraw from '../components/Withdraw';
 import { ethers } from 'ethers'
 
 export default {
@@ -99,6 +107,28 @@ export default {
         }
       })
     },
+    showWithdrawModal(index) {
+      let position = this.positions[index]
+      const synth = this.synths[position.name]
+      position.liquidationThresh = synth.liquidationThresh
+      position.price = synth.price
+      const self = this
+      this.$buefy.modal.open({
+        parent: this,
+        component: Withdraw,
+        trapFocus: true,
+        fullScreen:true,
+        customClass:"modal",
+        props:{
+          ...position
+        },
+        events:{
+          withdraw({collateral, synthName}){
+            self.$emit('withdraw', {collateral, synthName})
+          }
+        }
+      })
+    },
     balanceFormat(baseUnit) {
       return ethers.utils.formatEther(baseUnit)
     },
@@ -119,9 +149,5 @@ export default {
   margin:auto;
   margin-top:40px;
   min-width:300px;
-}
-.position-action {
-  display: inline;
-  cursor:pointer;
 }
 </style>

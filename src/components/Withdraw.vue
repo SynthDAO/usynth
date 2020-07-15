@@ -5,46 +5,76 @@
         </div>
         <section>
             <b-field label="Amount to Withdraw">
-                <b-input value="" placeholder="DAI to withdraw"></b-input>
+                <b-input v-model="collateralAmount" placeholder="DAI to withdraw"></b-input>
             </b-field>
             <div class="balance">
                 <div class="is-pulled-left">
-                    Current Collateral: {{balanceFormat(currentCollateral)}} DAI
+                    Current Collateral: {{balanceFormat(collateral)}} DAI
                 </div>
             </div>
             <div id="cratio">Collateralization Ratio</div>
-            <b-progress :value="cratio" :type="progressColor" :max="creq" show-value format="percent"></b-progress>
+            <b-progress :value="newCratio" :type="progressColor" :max="Number(creq)" show-value format="percent"></b-progress>
             <b-message v-if="progressColor === 'is-danger'" title="Insufficient Collateral" type="is-danger" :closable="false">
             Your collateral ratio is below the liquidation threshold ({{liquidationThresh}}%)
             </b-message>
             <b-message v-if="progressColor === 'is-warning'" title="Insufficient Collateral" type="is-warning" :closable="false">
-            Your collateral ratio is below the collateral requirement ({{creq}}%)
+            Your collateral ratio is below the global collateralization ratio ({{creq}}%)
             </b-message>
-            <b-button id="withdraw-button" type="is-primary">Withdraw</b-button>
+            <b-button @click="withdraw" :disabled="disabled" id="withdraw-button" type="is-primary">Withdraw</b-button>
         </section>
     </div>
 </template>
 
 <script>
 import { ethers } from 'ethers';
+import BigNumber from 'bignumber.js'
 export default {
   name: 'Withdraw',
-  props:['name', 'currentCollateral', 'cratio', 'creq', 'liquidationThresh'],
-  methods:{
-      balanceFormat(baseUnit) {
-          return ethers.utils.formatEther(baseUnit)
+  props:['name', 'collateral', 'creq', 'cratio', 'amount', 'price', 'liquidationThresh'],
+  data: () => {
+      return {
+          collateralAmount:""
       }
   },
+  methods:{
+    balanceFormat(baseUnit) {
+        return ethers.utils.formatEther(baseUnit)
+    },
+    withdraw() {
+        this.$emit('withdraw', {
+            collateral:this.collateralAmount,
+            synthName:this.name
+        })
+        this.$emit('close')
+    }
+  },
   computed: {
-      progressColor () {
-          if(this.cratio >= this.creq) {
-              return 'is-success'
-          } else if(this.cratio >= this.liquidationThresh) {
-              return "is-warning"
-          } else {
-              return "is-danger"
-          }
-      }
+    newCratio () {
+        if(this.collateralAmount === "") return Number(this.cratio)
+        if(isNaN(this.collateralAmount)) return Number(this.cratio)
+        let collateralAmount = BigNumber(this.collateralAmount).shiftedBy(18)
+        let existingCollateral = BigNumber(this.collateral.toString())
+        let existingAmount = BigNumber(this.amount.toString())
+        let price = BigNumber(this.price)
+        return existingCollateral.minus(collateralAmount).div(existingAmount.times(price)).times(100).toNumber()
+    },
+    progressColor () {
+        if(this.newCratio >= this.creq) {
+            return 'is-success'
+        } else if(this.newCratio >= this.liquidationThresh) {
+            return "is-warning"
+        } else {
+            return "is-danger"
+        }
+    },
+    disabled () {
+        if(this.newCratio < this.liquidationThresh) return true
+        if(isNaN(this.collateralAmount)) return true
+        if(this.collateralAmount > parseInt(this.balanceFormat(this.collateral))) return true
+        if(this.collateralAmount.length === 0) return true
+        if(this.collateralAmount === 0) return true
+        return false
+    }
   }
 }
 </script>
@@ -53,7 +83,8 @@ export default {
 .body {
     max-width:400px;
     margin:auto;
-
+    padding-top:50px;
+    padding-bottom:50px;
 }
 
 #withdraw-button {
