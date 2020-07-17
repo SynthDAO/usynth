@@ -114,7 +114,7 @@
                 </div>
             </div>
             <div id="cratio">Collateralization Ratio</div>
-            <b-progress :value="cratio" :type="progressColor" :max="Number(creq)" show-value format="percent"></b-progress>
+            <b-progress :value="cratio" :type="progressColor" :max="Number(creq)" show-value></b-progress>
             <b-message v-if="cratio < creq && cratio > 0" title="Insufficient Collateral" type="is-danger" :closable="false">
             Your collateral ratio is below the minimum collateral ({{creq}}%)
             </b-message>

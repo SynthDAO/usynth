@@ -25,6 +25,7 @@
         </b-table-column>
         <b-table-column field="pending" label="Pending">
             {{ props.row.pending }}
+            <button v-if="props.row.withdrawalReady" @click="$emit('confirmWithdrawal', props.row.name)" class="confirm-withdrawal-button">Confirm</button>
         </b-table-column>
         <b-table-column field="action" label="Action">
             <b-dropdown aria-role="list">

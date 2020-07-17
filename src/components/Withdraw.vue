@@ -13,12 +13,15 @@
                 </div>
             </div>
             <div id="cratio">Collateralization Ratio</div>
-            <b-progress :value="newCratio" :type="progressColor" :max="Number(creq)" show-value format="percent"></b-progress>
+            <b-progress :value="newCratio" :type="progressColor" :max="Number(creq)" show-value></b-progress>
             <b-message v-if="progressColor === 'is-danger'" title="Insufficient Collateral" type="is-danger" :closable="false">
             Your collateral ratio is below the liquidation threshold ({{liquidationThresh}}%)
             </b-message>
-            <b-message v-if="progressColor === 'is-warning'" title="Insufficient Collateral" type="is-warning" :closable="false">
-            Your collateral ratio is below the global collateralization ratio ({{creq}}%)
+            <b-message v-if="progressColor === 'is-warning'" title="Slow Withdrawal" type="is-warning" :closable="false">
+            Your collateral ratio is below the global collateralization ratio ({{creq}}%). This may trigger a slow withdrawal request.
+            </b-message>
+            <b-message v-if="progressColor === 'is-success' && collateralAmount.length !== 0" title="Instant Withdrawal" type="is-success" :closable="false">
+            Your collateral ratio is eligible for an instant withdrawal.
             </b-message>
             <b-button @click="withdraw" :disabled="disabled" id="withdraw-button" type="is-primary">Withdraw</b-button>
         </section>

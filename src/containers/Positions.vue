@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Positions @mint="mint" @withdraw="withdraw" :positions="positions" :synths="this.$store.state.synths" :daiBalance="this.$store.state.daiBalance"/>
+    <Positions @confirmWithdrawal="confirmWithdrawal" @mint="mint" @withdraw="withdraw" :positions="positions" :synths="this.$store.state.synths" :daiBalance="this.$store.state.daiBalance"/>
   </div>
 </template>
 
@@ -8,6 +8,7 @@
 // @ is an alias to /src
 import Positions from '@/screens/Positions.vue'
 import { ethers } from 'ethers'
+import BigNumber from 'bignumber.js'
 
 export default {
   name: 'Home',
@@ -21,8 +22,11 @@ export default {
         position.collateral = position.rawCollateral
         const synth = this.$store.state.synths[position.name]
         position.creq = synth.creq
-        position.cratio = position.collateral.div(position.amount.mul(parseInt(synth.price))).mul(100).toString()
+        const BigCollateral = BigNumber(position.collateral.toString())
+        const BigAmount = BigNumber(position.amount.toString())
+        position.cratio = BigCollateral.div(BigAmount.times(synth.price)).times(100).toFixed(4)
         position.pending = position.withdrawalRequestAmount.gt(0)? "Withdrawal: " + ethers.utils.formatEther(position.withdrawalRequestAmount) + " DAI": "none"
+        position.withdrawalReady = position.requestPassTimestamp.mul(1000).lt(Date.now())
         return position
       })      
     }
@@ -42,7 +46,7 @@ export default {
       const synthContract = this.$store.state.synths[synthName].contract
       const tx = await synthContract.create([weiCollateral], [weiSynth])
       this.$buefy.snackbar.open({
-          message: 'Your transaction has been submitted',
+          message: 'Your minting transaction has been submitted',
           type: 'is-success',
           position: 'is-top',
           actionText: 'Check TX',
@@ -61,12 +65,39 @@ export default {
     async withdraw({collateral, synthName}) {
       const weiCollateral = ethers.utils.parseUnits(collateral)
       const synthContract = this.$store.state.synths[synthName].contract
-      const tx = await synthContract.withdraw([weiCollateral])
+      let tx, message;
+      try {
+        tx = await synthContract.withdraw([weiCollateral])
+        message = 'A fast withdrawal has been submitted'
+      } catch(e) {
+        tx = await synthContract.requestWithdrawal([weiCollateral])
+        message = 'A slow withdrawal has been submitted'
+      }
       this.$buefy.snackbar.open({
-          message: 'Your withdrawal has been submitted',
+          message,
           type: 'is-success',
           position: 'is-top',
           actionText: 'Check TX',
+          indefinite: true,
+          onAction: () => {
+            const prefix = this.$store.state.network === "Mainnet"? "": (this.$store.state.network.toLowerCase() + ".")
+            const url = `https://${prefix}etherscan.io/tx/${tx.hash}`
+            var win = window.open(url, '_blank');
+            win.focus();
+          }
+      })
+      await tx.wait(3)
+      this.$store.dispatch('updatePositions')
+      this.$store.dispatch('updateBalances')
+    },
+    async confirmWithdrawal(synthName) {
+      const synthContract = this.$store.state.synths[synthName].contract
+      let tx = await synthContract.withdrawPassedRequest()
+      this.$buefy.snackbar.open({
+          message: "A withdrawal confirmation has been submitted",
+          type: 'is-success',
+          position: 'is-top',
+          actionText: 'Check TX', 
           indefinite: true,
           onAction: () => {
             const prefix = this.$store.state.network === "Mainnet"? "": (this.$store.state.network.toLowerCase() + ".")
