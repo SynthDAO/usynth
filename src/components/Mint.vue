@@ -125,9 +125,11 @@
 
 <script>
 import { ethers } from 'ethers';
+import BigNumber from 'bignumber.js'
+
 export default {
   name: 'Mint',
-  props:['name', 'priceFeed', 'price', 'expirationTimestamp', 'creq', 'daiBalance', 'synthBalance', 'liquidationThresh', 'minSponsorTokens'],
+  props:['name', 'priceFeed', 'price', 'expirationTimestamp', 'creq', 'daiBalance', 'synthBalance', 'liquidationThresh', 'minSponsorTokens', 'existingCollateral', 'existingSynth'],
   data:()=>{
       return {
           collateralAmount:"",
@@ -161,7 +163,16 @@ export default {
       cratio () {
           if(this.collateralAmount === "" || this.synthAmount === "") return 0
           if(isNaN(this.collateralAmount) || isNaN(this.synthAmount)) return 0
-          return this.collateralAmount / (this.synthAmount * this.price) * 100 // TODO: Use big numbers
+          const BigExistingCollateral = BigNumber(this.existingCollateral)
+          const BigExistingSynth = BigNumber(this.existingSynth)
+          const BigCollateralAmount = BigNumber(this.collateralAmount).shiftedBy(18)
+          const BigSynthAmount = BigNumber(this.synthAmount).shiftedBy(18)
+          const BigTotalCollateral = BigExistingCollateral.plus(BigCollateralAmount)
+          const BigTotalSynth = BigExistingSynth.plus(BigSynthAmount)
+          return BigTotalCollateral.div(
+              BigTotalSynth.times(this.price)
+          ).times(100).toNumber()
+          //return this.collateralAmount / (this.synthAmount * this.price) * 100 // TODO: Use big numbers
       },
       disabled () {
           if(this.cratio < this.creq) return true
@@ -169,7 +180,7 @@ export default {
           if(this.synthAmount < parseInt(this.balanceFormat(this.minSponsorTokens))) return true
           if(this.collateralAmount > parseInt(this.balanceFormat(this.daiBalance))) return true
           if(this.synthAmount.length === 0 || this.collateralAmount.length === 0) return true
-          if(this.synthAmount === 0 || this.collateralAmount === 0) return true
+          if(this.synthAmount === 0) return true
           return false
       }
   }

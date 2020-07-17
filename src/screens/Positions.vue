@@ -91,6 +91,14 @@ export default {
       const synth = this.synths[synthKey]
       synth.daiBalance = this.daiBalance
       synth.name = synthKey
+      synth.existingCollateral = this.positions
+        .filter((p) => p.name === synthKey)
+        .reduce((prev, curr) => prev.add(curr.rawCollateral), ethers.BigNumber.from(0))
+        .toString()
+      synth.existingSynth = this.positions
+        .filter((p) => p.name === synthKey)
+        .reduce((prev, curr) => prev.add(curr.tokensOutstanding), ethers.BigNumber.from(0))
+        .toString()
       const self = this
       this.$buefy.modal.open({
         parent: this,
