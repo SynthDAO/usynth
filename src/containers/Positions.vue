@@ -60,7 +60,6 @@ export default {
           type: 'is-success',
           position: 'is-top',
           actionText: 'Check TX',
-          indefinite: true,
           onAction: () => {
             const prefix = this.$store.state.network === "Mainnet"? "": (this.$store.state.network.toLowerCase() + ".")
             const url = `https://${prefix}etherscan.io/tx/${tx.hash}`
@@ -88,7 +87,6 @@ export default {
           type: 'is-success',
           position: 'is-top',
           actionText: 'Check TX',
-          indefinite: true,
           onAction: () => {
             const prefix = this.$store.state.network === "Mainnet"? "": (this.$store.state.network.toLowerCase() + ".")
             const url = `https://${prefix}etherscan.io/tx/${tx.hash}`
@@ -108,7 +106,6 @@ export default {
           type: 'is-success',
           position: 'is-top',
           actionText: 'Check TX', 
-          indefinite: true,
           onAction: () => {
             const prefix = this.$store.state.network === "Mainnet"? "": (this.$store.state.network.toLowerCase() + ".")
             const url = `https://${prefix}etherscan.io/tx/${tx.hash}`
@@ -128,7 +125,6 @@ export default {
           type: 'is-success',
           position: 'is-top',
           actionText: 'Check TX', 
-          indefinite: true,
           onAction: () => {
             const prefix = this.$store.state.network === "Mainnet"? "": (this.$store.state.network.toLowerCase() + ".")
             const url = `https://${prefix}etherscan.io/tx/${tx.hash}`
