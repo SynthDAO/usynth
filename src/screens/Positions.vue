@@ -3,7 +3,10 @@
     <div class="title">
       My Positions
     </div>
-    <div v-if="!positions || positions.length === 0" class="subtitle">
+    <div v-if="!authed" class="subtitle">
+      Connect your wallet to mint tokens and see your positions.
+    </div>
+    <div v-if="authed && (!positions || positions.length === 0)" class="subtitle">
       You have no open positions. Try minting a synth!
     </div>
     <b-table v-else :data="positions">
@@ -11,21 +14,23 @@
         <b-table-column field="name" label="Name">
             {{ props.row.name }}
         </b-table-column>
+        <b-table-column field="price" label="Index Price">
+            {{ props.row.price }}
+        </b-table-column>
         <b-table-column field="amount" label="Amount">
             {{ balanceFormat(props.row.amount) }}
         </b-table-column>
-        <b-table-column field="collateral" label="Collateral">
-            {{ balanceFormat(props.row.collateral) }} DAI
+        <b-table-column field="collateral" label="Collateral (Ratio)">
+            {{ balanceFormat(props.row.collateral) }} DAI ({{ props.row.cratio }}%)
         </b-table-column>
-        <b-table-column field="cratio" label="C. Ratio">
-            {{ props.row.cratio }}%
+        <b-table-column field="saferatio" label="Safe Ratio">
+            {{ props.row.creq }}%
         </b-table-column>
         <b-table-column field="creq" label="C. Req.">
-            {{ props.row.creq }}%
+            {{ props.row.liquidationThresh }}%
         </b-table-column>
         <b-table-column field="pending" label="Pending">
             {{ props.row.pending }}
-            <button v-if="props.row.withdrawalReady" @click="$emit('confirmWithdrawal', props.row.name)" class="confirm-withdrawal-button">Confirm</button>
         </b-table-column>
         <b-table-column field="action" label="Action">
             <b-dropdown aria-role="list">
@@ -35,6 +40,8 @@
               <b-dropdown-item @click="showMintModal(props.row.name)" aria-role="listitem">Mint</b-dropdown-item>
               <b-dropdown-item @click="showWithdrawModal(props.index)" aria-role="listitem">Withdraw</b-dropdown-item>
               <b-dropdown-item aria-role="listitem">Trade</b-dropdown-item>
+              <b-dropdown-item v-if="props.row.withdrawalReady" @click="$emit('confirmWithdrawal', props.row.name)" aria-role="listitem">Complete Withdrawal</b-dropdown-item>
+              <b-dropdown-item v-if="props.row.pendingWithdrawal" @click="$emit('cancelWithdrawal', props.row.name)" aria-role="listitem">Cancel Withdrawal</b-dropdown-item>
           </b-dropdown>
         </b-table-column>
       </template>
@@ -55,7 +62,7 @@ import { ethers } from 'ethers'
 
 export default {
   name: 'Positions',
-  props:['positions', 'synths', 'daiBalance'],
+  props:['positions', 'synths', 'daiBalance', 'authed'],
   data () {
     return {
       columns: [

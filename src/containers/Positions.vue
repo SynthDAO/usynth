@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Positions @confirmWithdrawal="confirmWithdrawal" @mint="mint" @withdraw="withdraw" :positions="positions" :synths="this.$store.state.synths" :daiBalance="this.$store.state.daiBalance"/>
+    <Positions @confirmWithdrawal="confirmWithdrawal" @cancelWithdrawal="cancelWithdrawal" @mint="mint" @withdraw="withdraw" :authed="this.$store.state.authed" :positions="positions" :synths="this.$store.state.synths" :daiBalance="this.$store.state.daiBalance"/>
   </div>
 </template>
 
@@ -21,12 +21,22 @@ export default {
         position.amount = position.tokensOutstanding
         position.collateral = position.rawCollateral
         const synth = this.$store.state.synths[position.name]
+        position.price = synth.price
+        position.liquidationThresh = synth.liquidationThresh
         position.creq = synth.creq
         const BigCollateral = BigNumber(position.collateral.toString())
         const BigAmount = BigNumber(position.amount.toString())
         position.cratio = BigCollateral.div(BigAmount.times(synth.price)).times(100).toFixed(4)
-        position.pending = position.withdrawalRequestAmount.gt(0)? "Withdrawal: " + ethers.utils.formatEther(position.withdrawalRequestAmount) + " DAI": "none"
-        position.withdrawalReady = position.requestPassTimestamp.mul(1000).lt(Date.now())
+        position.pendingWithdrawal = position.withdrawalRequestAmount.gt(0)
+        position.withdrawalReady = position.pendingWithdrawal && position.requestPassTimestamp.mul(1000).lt(Date.now())
+        if(!position.pendingWithdrawal) {
+          position.pending = "none"
+        } else if(position.withdrawalReady) {
+          position.pending = "Withdrawal: Ready"
+        } else {
+          const minutesLeft = position.requestPassTimestamp.mul(1000).sub(Date.now()).div(60000).toString() + "m"
+          position.pending = `${ethers.utils.formatEther(position.withdrawalRequestAmount)} DAI (${minutesLeft})`
+        }
         return position
       })      
     }
@@ -58,7 +68,7 @@ export default {
             win.focus();
           }
       })
-      await tx.wait(3)
+      await tx.wait(2)
       this.$store.dispatch('updatePositions')
       this.$store.dispatch('updateBalances')
     },
@@ -86,7 +96,7 @@ export default {
             win.focus();
           }
       })
-      await tx.wait(3)
+      await tx.wait(2)
       this.$store.dispatch('updatePositions')
       this.$store.dispatch('updateBalances')
     },
@@ -106,7 +116,27 @@ export default {
             win.focus();
           }
       })
-      await tx.wait(3)
+      await tx.wait(2)
+      this.$store.dispatch('updatePositions')
+      this.$store.dispatch('updateBalances')
+    },
+    async cancelWithdrawal(synthName) {
+      const synthContract = this.$store.state.synths[synthName].contract
+      let tx = await synthContract.cancelWithdrawal()
+      this.$buefy.snackbar.open({
+          message: "A withdrawal cancellation has been submitted",
+          type: 'is-success',
+          position: 'is-top',
+          actionText: 'Check TX', 
+          indefinite: true,
+          onAction: () => {
+            const prefix = this.$store.state.network === "Mainnet"? "": (this.$store.state.network.toLowerCase() + ".")
+            const url = `https://${prefix}etherscan.io/tx/${tx.hash}`
+            var win = window.open(url, '_blank');
+            win.focus();
+          }
+      })
+      await tx.wait(2)
       this.$store.dispatch('updatePositions')
       this.$store.dispatch('updateBalances')
     }
