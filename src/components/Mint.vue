@@ -1,7 +1,7 @@
 <template>
     <div class="body">
         <div class="title has-text-centered">
-        Mint {{name}}
+        Mint {{symbol}}
         </div>
         <div class="level item">
             <div class="level-left">
@@ -106,11 +106,11 @@
                 </div>
             </div>
             <b-field label="Mint Synth">
-                <b-input v-model="synthAmount" :placeholder="'Mint ' + name"></b-input>
+                <b-input v-model="synthAmount" :placeholder="'Mint ' + symbol"></b-input>
             </b-field>
             <div class="balance">
                 <div class="is-pulled-left">
-                    Balance: {{balanceFormat(synthBalance)}} {{name}}
+                    Balance: {{balanceFormat(synthBalance)}} {{symbol}}
                 </div>
             </div>
             <div id="cratio">Collateralization Ratio</div>
@@ -118,7 +118,7 @@
             <b-message v-if="cratio < creq && cratio > 0" title="Insufficient Collateral" type="is-danger" :closable="false">
             Your collateral ratio is below the minimum collateral ({{creq}}%)
             </b-message>
-            <b-button :disabled="disabled" @click="mint" id="mint-button" type="is-primary">Mint {{name}}</b-button>
+            <b-button :disabled="disabled" @click="mint" id="mint-button" type="is-primary">Mint {{symbol}}</b-button>
         </section>
     </div>
 </template>
@@ -129,7 +129,7 @@ import BigNumber from 'bignumber.js'
 
 export default {
   name: 'Mint',
-  props:['name', 'priceFeed', 'price', 'expirationTimestamp', 'creq', 'daiBalance', 'synthBalance', 'liquidationThresh', 'minSponsorTokens', 'existingCollateral', 'existingSynth'],
+  props:['name', 'symbol', 'priceFeed', 'price', 'expirationTimestamp', 'creq', 'daiBalance', 'synthBalance', 'liquidationThresh', 'minSponsorTokens', 'existingCollateral', 'existingSynth'],
   data:()=>{
       return {
           collateralAmount:"",

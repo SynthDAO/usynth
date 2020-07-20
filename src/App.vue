@@ -49,6 +49,7 @@ export default {
           let synthAddress = await contract.tokenCurrency()
           let tokenContract = new ethers.Contract(synthAddress, daiAbi, wallet) // DAI abi includes the necessary ERC20 interface
           let synthBalance = (await tokenContract.balanceOf(address)).toString()
+          let symbol = await tokenContract.symbol()
           let cumulativeFeeMultiplier = (await contract.cumulativeFeeMultiplier()).toString()
           let rawTotalPositionCollateral = (await contract.rawTotalPositionCollateral()).toString()
           let totalTokensOutstanding = (await contract.totalTokensOutstanding()).toString()
@@ -70,7 +71,8 @@ export default {
             priceFeed,
             liquidationThresh,
             expirationTimestamp,
-            pool
+            pool,
+            symbol
           }
         }
         this.$store.commit('init', {

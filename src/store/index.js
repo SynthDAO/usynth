@@ -58,6 +58,7 @@ export default new Vuex.Store({
           if(contractPositions.tokensOutstanding[i].gt(0)) {
             positions.push({
               name:synth,
+              symbol: context.state.synths[synth].symbol,
               tokensOutstanding: contractPositions.tokensOutstanding[i],
               requestPassTimestamp:contractPositions.requestPassTimestamp,
               withdrawalRequestAmount:contractPositions.withdrawalRequestAmount[i],

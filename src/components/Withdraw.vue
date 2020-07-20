@@ -1,7 +1,7 @@
 <template>
     <div class="body">
         <div class="title has-text-centered">
-        Withdraw Collateral from {{name}}
+        Withdraw Collateral from {{symbol}}
         </div>
         <section>
             <b-field label="Amount to Withdraw">
@@ -33,7 +33,7 @@ import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js'
 export default {
   name: 'Withdraw',
-  props:['name', 'collateral', 'creq', 'cratio', 'amount', 'price', 'liquidationThresh'],
+  props:['name', 'symbol', 'collateral', 'creq', 'cratio', 'amount', 'price', 'liquidationThresh'],
   data: () => {
       return {
           collateralAmount:""

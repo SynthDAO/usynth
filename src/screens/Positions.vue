@@ -12,7 +12,7 @@
     <b-table v-else :data="positions">
       <template slot-scope="props">
         <b-table-column field="name" label="Name">
-            {{ props.row.name }}
+            {{ props.row.symbol }}
         </b-table-column>
         <b-table-column field="price" label="Index Price">
             {{ props.row.price }}
@@ -50,7 +50,7 @@
         <button :disabled="Object.keys(synths).length === 0" class="button is-primary" size="is-medium" slot="trigger">
             Mint a Synth
         </button>
-        <b-dropdown-item v-for="(synth, key) in synths" :key="key" @click='showMintModal(key)' aria-role="listitem">{{key}}</b-dropdown-item>
+        <b-dropdown-item v-for="(synth, key) in synths" :key="key" @click='showMintModal(key)' aria-role="listitem">{{synth.symbol}}</b-dropdown-item>
     </b-dropdown>
   </div>
 </template>
