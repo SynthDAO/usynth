@@ -98,6 +98,17 @@ export default {
       const synth = this.synths[synthKey]
       synth.daiBalance = this.daiBalance
       synth.name = synthKey
+      let pendingWithdrawal = this.positions
+      .filter((p) => p.name === synthKey)
+      .reduce((prev, curr) => prev === true || curr.pendingWithdrawal, false)
+      if(pendingWithdrawal) {
+        this.$buefy.snackbar.open({
+          message: 'Please cancel or confirm the pending withdrawal to mint this synth',
+          type: 'is-danger',
+          position: 'is-top'
+        })
+        return
+      }
       synth.existingCollateral = this.positions
         .filter((p) => p.name === synthKey)
         .reduce((prev, curr) => prev.add(curr.rawCollateral), ethers.BigNumber.from(0))
