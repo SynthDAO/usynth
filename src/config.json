@@ -2,13 +2,19 @@
     "kovan":{
         "daiAddress":"0xbF7A7169562078c96f0eC1A8aFD6aE50f12e5A99",
         "synths":{
-            "COMP/USD":"0x3Ce65E51FE0eDeEde01B9DDADd8990308e314d97"
+            "COMP/USD":{
+                "address":"0x3Ce65E51FE0eDeEde01B9DDADd8990308e314d97",
+                "pool":"https://uniswap.info/token/0xc78ce805599188ed734c943c912800658807fa14"
+            }
         }
     },
     "mainnet":{
         "daiAddress":"0x6b175474e89094c44da98b954eedeac495271d0f",
         "synths":{
-            "COMP/USD":"0x67DD35EaD67FcD184C8Ff6D0251DF4241F309ce1"
+            "COMP/USD":{
+                "address": "0x67DD35EaD67FcD184C8Ff6D0251DF4241F309ce1",
+                "pool":"https://uniswap.info/token/0xc78ce805599188ed734c943c912800658807fa14"
+            }
         }
     }
 }

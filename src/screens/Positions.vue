@@ -39,7 +39,7 @@
               </button>
               <b-dropdown-item @click="showMintModal(props.row.name)" aria-role="listitem">Mint</b-dropdown-item>
               <b-dropdown-item @click="showWithdrawModal(props.index)" aria-role="listitem">Withdraw</b-dropdown-item>
-              <b-dropdown-item aria-role="listitem">Trade</b-dropdown-item>
+              <b-dropdown-item @click="goToPool(props.row.name)" aria-role="listitem">Trade</b-dropdown-item>
               <b-dropdown-item v-if="props.row.withdrawalReady" @click="$emit('confirmWithdrawal', props.row.name)" aria-role="listitem">Complete Withdrawal</b-dropdown-item>
               <b-dropdown-item v-if="props.row.pendingWithdrawal" @click="$emit('cancelWithdrawal', props.row.name)" aria-role="listitem">Cancel Withdrawal</b-dropdown-item>
           </b-dropdown>
@@ -144,6 +144,11 @@ export default {
           }
         }
       })
+    },
+    goToPool(synthKey) {
+      const synth = this.synths[synthKey]
+      var win = window.open(synth.pool, '_blank');
+      win.focus();
     },
     balanceFormat(baseUnit) {
       return ethers.utils.formatEther(baseUnit)

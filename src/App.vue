@@ -44,7 +44,8 @@ export default {
         let daiBalance = (await daiContract.balanceOf(window.ethereum.selectedAddress)).toString()
         let synths = {}
         for (let synth in config[network.toLowerCase()].synths) {
-          let contract = new ethers.Contract(config[network.toLowerCase()].synths[synth], empAbi, wallet)
+          let contract = new ethers.Contract(config[network.toLowerCase()].synths[synth].address, empAbi, wallet)
+          let pool = config[network.toLowerCase()].synths[synth].pool
           let synthAddress = await contract.tokenCurrency()
           let tokenContract = new ethers.Contract(synthAddress, daiAbi, wallet) // DAI abi includes the necessary ERC20 interface
           let synthBalance = (await tokenContract.balanceOf(address)).toString()
@@ -68,7 +69,8 @@ export default {
             price,
             priceFeed,
             liquidationThresh,
-            expirationTimestamp
+            expirationTimestamp,
+            pool
           }
         }
         this.$store.commit('init', {
