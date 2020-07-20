@@ -16,7 +16,7 @@ import config from './config.json'
 import daiAbi from './abi/DAI.json'
 import empAbi from './abi/EMP.json'
 import BigNumber from "bignumber.js"
-import { getPairPrice } from './api/cryptowatch'
+import { getPairPrice } from './api/price'
 export default {
   components:{
     NavBar
