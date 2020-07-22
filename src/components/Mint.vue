@@ -118,6 +118,9 @@
             <b-message v-if="cratio < creq && cratio > 0" title="Insufficient Collateral" type="is-danger" :closable="false">
             Your collateral ratio is below the minimum collateral ({{creq}}%)
             </b-message>
+            <b-message v-if="synthAmount.length > 0 && synthAmount < parseInt(balanceFormat(minSponsorTokens))" title="Below Minimum Minting Amount" type="is-danger" :closable="false">
+            The synth amount you have entered is below the minimum ({{balanceFormat(minSponsorTokens)}})
+            </b-message>
             <b-button :disabled="disabled" @click="mint" id="mint-button" type="is-primary">Mint {{symbol}}</b-button>
         </section>
     </div>
