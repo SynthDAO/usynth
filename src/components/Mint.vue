@@ -50,7 +50,7 @@
             </div>
             <div class="level-right">
                 <div class="level-item is-pulled-right">
-                DAI
+                {{collateralSymbol}}
                 </div>
             </div>
         </div>
@@ -98,11 +98,11 @@
 
         <section>
             <b-field label="Deposit Collateral">
-                <b-input v-model="collateralAmount" placeholder="Deposit DAI"></b-input>
+                <b-input v-model="collateralAmount" :placeholder="'Deposit ' + collateralSymbol"></b-input>
             </b-field>
             <div class="balance">
                 <div class="is-pulled-left">
-                    Balance: {{balanceFormat(daiBalance)}} DAI
+                    Balance: {{balanceFormat(collateralBalance)}} {{collateralSymbol}}
                 </div>
             </div>
             <b-field label="Mint Synth">
@@ -132,7 +132,7 @@ import BigNumber from 'bignumber.js'
 
 export default {
   name: 'Mint',
-  props:['name', 'symbol', 'priceFeed', 'price', 'expirationTimestamp', 'creq', 'daiBalance', 'synthBalance', 'liquidationThresh', 'minSponsorTokens', 'existingCollateral', 'existingSynth'],
+  props:['name', 'symbol', 'priceFeed', 'price', 'expirationTimestamp', 'creq', 'collateralBalance', 'collateralSymbol', 'synthBalance', 'liquidationThresh', 'minSponsorTokens', 'existingCollateral', 'existingSynth'],
   data:()=>{
       return {
           collateralAmount:"",
@@ -181,7 +181,7 @@ export default {
           if(this.cratio < this.creq) return true
           if(isNaN(this.collateralAmount) || isNaN(this.synthAmount)) return true
           if(this.synthAmount < parseInt(this.balanceFormat(this.minSponsorTokens))) return true
-          if(this.collateralAmount > parseInt(this.balanceFormat(this.daiBalance))) return true
+          if(this.collateralAmount > parseInt(this.balanceFormat(this.collateralBalance))) return true
           if(this.synthAmount.length === 0 || this.collateralAmount.length === 0) return true
           if(this.synthAmount === 0) return true
           return false

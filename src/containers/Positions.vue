@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Positions @confirmWithdrawal="confirmWithdrawal" @cancelWithdrawal="cancelWithdrawal" @mint="mint" @withdraw="withdraw" :authed="this.$store.state.authed" :positions="positions" :synths="this.$store.state.synths" :daiBalance="this.$store.state.daiBalance"/>
+    <Positions @confirmWithdrawal="confirmWithdrawal" @cancelWithdrawal="cancelWithdrawal" @mint="mint" @withdraw="withdraw" :authed="this.$store.state.authed" :positions="positions" :synths="this.$store.state.synths"/>
   </div>
 </template>
 
@@ -24,6 +24,7 @@ export default {
         position.price = synth.price
         position.liquidationThresh = synth.liquidationThresh
         position.creq = synth.creq
+        position.collateralSymbol = synth.collateralSymbol
         const BigCollateral = BigNumber(position.collateral.toString())
         const BigAmount = BigNumber(position.amount.toString())
         position.cratio = BigCollateral.div(BigAmount.times(synth.price)).times(100).toFixed(4)
@@ -35,7 +36,7 @@ export default {
           position.pending = "Withdrawal: Ready"
         } else {
           const minutesLeft = position.requestPassTimestamp.mul(1000).sub(Date.now()).div(60000).toString() + "m"
-          position.pending = `${ethers.utils.formatEther(position.withdrawalRequestAmount)} DAI (${minutesLeft})`
+          position.pending = `${ethers.utils.formatEther(position.withdrawalRequestAmount)} ${synth.collateralSymbol} (${minutesLeft})`
         }
         return position
       })      
@@ -43,14 +44,14 @@ export default {
   },
   methods:{
     async mint({collateral, synth, synthName}) {
-      const daiContract = this.$store.state.daiContract
+      const collateralContract = this.$store.state.synths[synthName].collateralContract
       const synthAddress = this.$store.state.synths[synthName].contract.address
       const weiCollateral = ethers.utils.parseUnits(collateral)
       const weiSynth = ethers.utils.parseUnits(synth)
-      const allowance = await daiContract.allowance(this.$store.state.address, synthAddress)
+      const allowance = await collateralContract.allowance(this.$store.state.address, synthAddress)
       const MAX_UINT256 = ethers.BigNumber.from(2).pow(256).sub(1)
       if(allowance.lt(weiCollateral)) {
-        const approveTx = await daiContract.approve(synthAddress, MAX_UINT256)
+        const approveTx = await collateralContract.approve(synthAddress, MAX_UINT256)
         await approveTx.wait()
       }
       const synthContract = this.$store.state.synths[synthName].contract

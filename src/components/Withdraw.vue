@@ -5,11 +5,11 @@
         </div>
         <section>
             <b-field label="Amount to Withdraw">
-                <b-input v-model="collateralAmount" placeholder="DAI to withdraw"></b-input>
+                <b-input v-model="collateralAmount" :placeholder="collateralSymbol + ' to withdraw'"></b-input>
             </b-field>
             <div class="balance">
                 <div class="is-pulled-left">
-                    Current Collateral: {{balanceFormat(collateral)}} DAI
+                    Current Collateral: {{balanceFormat(collateral)}} {{collateralSymbol}}
                 </div>
             </div>
             <div id="cratio">Collateralization Ratio</div>
@@ -33,7 +33,7 @@ import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js'
 export default {
   name: 'Withdraw',
-  props:['name', 'symbol', 'collateral', 'creq', 'cratio', 'amount', 'price', 'liquidationThresh'],
+  props:['name', 'symbol', 'collateral', 'collateralSymbol', 'creq', 'cratio', 'amount', 'price', 'liquidationThresh'],
   data: () => {
       return {
           collateralAmount:""

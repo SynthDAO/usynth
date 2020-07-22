@@ -40,14 +40,15 @@ export default {
         await this.until(() => typeof window.ethereum.selectedAddress === 'string')
         let address = window.ethereum.selectedAddress
         this.$store.commit('auth', {address, network, wallet})
-        let daiContract = new ethers.Contract(config[network.toLowerCase()].daiAddress, daiAbi, wallet)
-        let daiBalance = (await daiContract.balanceOf(window.ethereum.selectedAddress)).toString()
         let synths = {}
         for (let synth in config[network.toLowerCase()].synths) {
           let contract = new ethers.Contract(config[network.toLowerCase()].synths[synth].address, empAbi, wallet)
           let pool = config[network.toLowerCase()].synths[synth].pool
           let synthAddress = await contract.tokenCurrency()
           let tokenContract = new ethers.Contract(synthAddress, daiAbi, wallet) // DAI abi includes the necessary ERC20 interface
+          let collateralAddress = await contract.collateralCurrency()
+          let collateralContract = new ethers.Contract(collateralAddress, daiAbi, wallet)
+          let collateralSymbol = await collateralContract.symbol()
           let synthBalance = (await tokenContract.balanceOf(address)).toString()
           let symbol = await tokenContract.symbol()
           let cumulativeFeeMultiplier = (await contract.cumulativeFeeMultiplier()).toString()
@@ -72,15 +73,14 @@ export default {
             liquidationThresh,
             expirationTimestamp,
             pool,
-            symbol
+            symbol,
+            collateralContract,
+            collateralSymbol
           }
         }
-        this.$store.commit('init', {
-          daiContract,
-          daiBalance,
-          synths,
-        })
+        this.$store.commit('init', synths)
         await this.$store.dispatch('updatePositions')
+        await this.$store.dispatch('updateBalances')
         this.watchBalances()
       } else {
         this.$buefy.dialog.alert({

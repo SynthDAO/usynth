@@ -21,7 +21,7 @@
             {{ balanceFormat(props.row.amount) }}
         </b-table-column>
         <b-table-column field="collateral" label="Collateral (Ratio)">
-            {{ balanceFormat(props.row.collateral) }} DAI ({{ props.row.cratio }}%)
+            {{ balanceFormat(props.row.collateral) }} {{props.row.collateralSymbol}} ({{ props.row.cratio }}%)
         </b-table-column>
         <b-table-column field="saferatio" label="Safe Ratio">
             {{ props.row.creq }}%
@@ -62,7 +62,7 @@ import { ethers } from 'ethers'
 
 export default {
   name: 'Positions',
-  props:['positions', 'synths', 'daiBalance', 'authed'],
+  props:['positions', 'synths', 'authed'],
   data () {
     return {
       columns: [
@@ -96,7 +96,6 @@ export default {
   methods:{
     showMintModal(synthKey) {
       const synth = this.synths[synthKey]
-      synth.daiBalance = this.daiBalance
       synth.name = synthKey
       let pendingWithdrawal = this.positions
       .filter((p) => p.name === synthKey)
@@ -139,6 +138,7 @@ export default {
       const synth = this.synths[position.name]
       position.liquidationThresh = synth.liquidationThresh
       position.price = synth.price
+      position.collateralSymbol = synth.collateralSymbol
       const self = this
       this.$buefy.modal.open({
         parent: this,

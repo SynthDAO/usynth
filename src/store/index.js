@@ -8,8 +8,6 @@ export default new Vuex.Store({
     authed:false,
     address:"",
     network:"",
-    daiBalance:"",
-    daiContract:undefined,
     wallet:{},
     synths:{},
     positions:[]
@@ -21,16 +19,14 @@ export default new Vuex.Store({
       state.wallet = wallet
       state.authed = true
     },
-    init (state, {synths, daiBalance, daiContract}) {
+    init (state, synths) {
       state.synths = synths
-      state.daiBalance = daiBalance
-      state.daiContract = daiContract
     },
-    updateBalances (state, {daiBalance, synthBalances}) {
-      state.daiBalance = daiBalance
+    updateBalances (state, synthBalances) {
       let synths = Object.assign({}, state.synths)
       for (let synth in synths) {
-        synths[synth].synthBalance = synthBalances[synth]
+        synths[synth].synthBalance = synthBalances[synth].synthBalance
+        synths[synth].collateralBalance = synthBalances[synth].collateralBalance
       }
       state.synths = synths
     },
@@ -41,14 +37,14 @@ export default new Vuex.Store({
   actions: {
     async updateBalances (context) {
       const address = context.state.address;
-      const daiBalance = (await context.state.daiContract.balanceOf(address)).toString()
       let synthBalances = {}
       for (let synth in context.state.synths) {
-        const tokenContract = context.state.synths[synth].tokenContract
+        const {tokenContract, collateralContract} = context.state.synths[synth]
         const synthBalance = (await tokenContract.balanceOf(address)).toString()
-        synthBalances[synth] = synthBalance
+        const collateralBalance = (await collateralContract.balanceOf(address)).toString()
+        synthBalances[synth] = {synthBalance, collateralBalance}
       }
-      context.commit('updateBalances', {daiBalance, synthBalances})
+      context.commit('updateBalances', synthBalances)
     },
     async updatePositions (context) {
       let positions = []
