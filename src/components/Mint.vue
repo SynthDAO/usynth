@@ -132,7 +132,7 @@ import BigNumber from 'bignumber.js'
 
 export default {
   name: 'Mint',
-  props:['name', 'symbol', 'priceFeed', 'price', 'expirationTimestamp', 'creq', 'collateralBalance', 'collateralSymbol', 'synthBalance', 'liquidationThresh', 'minSponsorTokens', 'existingCollateral', 'existingSynth'],
+  props:['name', 'symbol', 'priceFeed', 'price', 'expirationTimestamp', 'creq', 'collateralBalance', 'collateralSymbol', 'synthBalance', 'liquidationThresh', 'minSponsorTokens'],
   data:()=>{
       return {
           collateralAmount:"",
@@ -166,16 +166,11 @@ export default {
       cratio () {
           if(this.collateralAmount === "" || this.synthAmount === "") return 0
           if(isNaN(this.collateralAmount) || isNaN(this.synthAmount)) return 0
-          const BigExistingCollateral = BigNumber(this.existingCollateral)
-          const BigExistingSynth = BigNumber(this.existingSynth)
           const BigCollateralAmount = BigNumber(this.collateralAmount).shiftedBy(18)
           const BigSynthAmount = BigNumber(this.synthAmount).shiftedBy(18)
-          const BigTotalCollateral = BigExistingCollateral.plus(BigCollateralAmount)
-          const BigTotalSynth = BigExistingSynth.plus(BigSynthAmount)
-          return BigTotalCollateral.div(
-              BigTotalSynth.times(this.price)
+          return BigCollateralAmount.div(
+              BigSynthAmount.times(this.price)
           ).times(100).toNumber()
-          //return this.collateralAmount / (this.synthAmount * this.price) * 100 // TODO: Use big numbers
       },
       disabled () {
           if(this.cratio < this.creq) return true
