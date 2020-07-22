@@ -52,6 +52,10 @@
         </button>
         <b-dropdown-item v-for="(synth, key) in synths" :key="key" @click='showMintModal(key)' aria-role="listitem">{{synth.symbol}}</b-dropdown-item>
     </b-dropdown>
+    <footer class="footer">
+      <p><a href="https://github.com/SynthDAO/usynth">Github</a> | <a href="https://discord.gg/CfX6rdS">Discord</a> | <a href="https://docs.umaproject.org/synthetic-tokens/explainer/">UMA Synths</a></p>
+      <p><em><small>Disclaimer: this frontend is in beta and has not been audited. Smart contracts by UMA Protocol. Use at your own risk.</small></em></p>
+  </footer>
   </div>
 </template>
 
@@ -173,5 +177,15 @@ export default {
   margin:auto;
   margin-top:40px;
   min-width:300px;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+    background:#f9fafb;
 }
 </style>
