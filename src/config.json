@@ -16,6 +16,11 @@
             "ETH/BTC":{
                 "address":"0x3f2d9edd9702909cf1f8c4237b7c4c5931f9c944",
                 "pool":"https://uniswap.info/token/0x6d002a834480367fb1a1dc5f47e82fde39ec2c42"
+            },
+            "USD/ETH":{	
+                "address":"0xb56C5f1fB93b1Fbd7c473926c87B6B9c4d0e21d5",	
+                "pool":"https://balancer.exchange/#/swap/0x81ab848898b5ffd3354dbbefb333d5d183eedcb5/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "invertedPrice":true	
             }
         }
     }

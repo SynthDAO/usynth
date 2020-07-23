@@ -56,7 +56,7 @@ export default {
           let totalTokensOutstanding = (await contract.totalTokensOutstanding()).toString()
           let minSponsorTokens = (await contract.minSponsorTokens()).toString()
           let GCR = BigNumber(cumulativeFeeMultiplier).shiftedBy(-18).times(rawTotalPositionCollateral).div(totalTokensOutstanding).toFixed()
-          let price = await getPairPrice(synth.replace('/', '-').toLowerCase())
+          let price = await getPairPrice(synth.replace('/', '-').toLowerCase(), config[network.toLowerCase()].synths[synth].invertedPrice)
           let creq = BigNumber(GCR).div(price).times(100).toFixed(4)
           let expirationTimestamp = (await contract.expirationTimestamp()).toNumber()
           let priceFeed = ethers.utils.parseBytes32String(await contract.priceIdentifier())
