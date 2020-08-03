@@ -1,6 +1,41 @@
 <template>
   <div class="has-text-centered">
     <div class="title">
+      Synths
+    </div>
+    <div v-if="!authed" class="subtitle">
+      Connect your wallet to see available Synths.
+    </div>
+    <b-table v-if="synthsArray.length > 0" :data="synthsArray">
+      <template slot-scope="s">
+        <b-table-column field="symbol" label="Name">
+            {{ s.row.symbol }}
+        </b-table-column>
+        <b-table-column field="price" label="Index Price">
+            {{ s.row.price }}
+        </b-table-column>
+        <b-table-column field="balance" label="Balance">
+            {{ balanceFormat(s.row.synthBalance) }}
+        </b-table-column>
+        <b-table-column field="saferatio" label="GCR">
+            {{ s.row.creq }}%
+        </b-table-column>
+        <b-table-column field="creq" label="C. Req.">
+            {{ s.row.liquidationThresh }}%
+        </b-table-column>
+        <b-table-column field="action" label="Action">
+          <b-dropdown aria-role="list">
+            <button slot="trigger" slot-scope="{ active }">
+                <b-icon :icon="active ? 'menu-up' : 'menu-down'"></b-icon>
+            </button>
+            <b-dropdown-item @click="showMintModal(s.row.name)" aria-role="listitem">Mint</b-dropdown-item>
+            <b-dropdown-item @click="goToPool(s.row.name)" aria-role="listitem">Trade</b-dropdown-item>
+            <b-dropdown-item v-if="s.row.isExpired" @click="$emit('redeemExpired', s.row.name)" aria-role="listitem">Redeem Expired</b-dropdown-item>
+          </b-dropdown>
+        </b-table-column>
+      </template>
+    </b-table>
+    <div class="title">
       My Positions
     </div>
     <div v-if="!authed" class="subtitle">
@@ -67,34 +102,15 @@ import { ethers } from 'ethers'
 export default {
   name: 'Positions',
   props:['positions', 'synths', 'authed'],
-  data () {
-    return {
-      columns: [
-        {
-            field: 'name',
-            label: 'Name',
-        },
-        {
-            field: 'amount',
-            label: 'Amount',
-        },
-        {
-            field: 'collateral',
-            label: 'Collateral',
-        },
-        {
-            field: 'cratio',
-            label: 'C. Ratio',
-        },
-        {
-            field: 'creq',
-            label: 'C. Req.',
-        },
-        {
-            field: 'pending',
-            label: 'Pending',
-        }
-      ]
+  computed: {
+    synthsArray () {
+      return Object.entries(this.synths)
+        .map((synth) => {
+          let name = synth[0]
+          synth = synth[1]
+          synth.name = name
+          return synth
+        })
     }
   },
   methods:{
@@ -158,7 +174,11 @@ export default {
       win.focus();
     },
     balanceFormat(baseUnit) {
-      return ethers.utils.formatEther(baseUnit)
+      try {
+        return ethers.utils.formatEther(baseUnit)
+      } catch(e) {
+        return 0
+      }
     },
   }
 }
@@ -166,8 +186,8 @@ export default {
 
 <style lang="scss" scoped>
 .title {
-  margin-top:100px;
-  margin-bottom:100px !important;
+  margin-top:50px;
+  margin-bottom:50px !important;
 }
 .subtitle {
   margin-bottom:100px !important;

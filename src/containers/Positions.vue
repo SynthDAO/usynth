@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Positions @confirmWithdrawal="confirmWithdrawal" @cancelWithdrawal="cancelWithdrawal" @mint="mint" @withdraw="withdraw" :authed="this.$store.state.authed" :positions="positions" :synths="this.$store.state.synths"/>
+    <Positions @redeemExpired="redeemExpired" @confirmWithdrawal="confirmWithdrawal" @cancelWithdrawal="cancelWithdrawal" @mint="mint" @withdraw="withdraw" :authed="this.$store.state.authed" :positions="positions" :synths="this.$store.state.synths"/>
   </div>
 </template>
 
@@ -136,7 +136,26 @@ export default {
       await tx.wait(2)
       this.$store.dispatch('updatePositions')
       this.$store.dispatch('updateBalances')
-    }
+    },
+    async redeemExpired(synthName) {
+      const synthContract = this.$store.state.synths[synthName].contract
+      let tx = await synthContract.settleExpired()
+      this.$buefy.snackbar.open({
+          message: "A redeem request has been submitted",
+          type: 'is-success',
+          position: 'is-top',
+          actionText: 'Check TX', 
+          onAction: () => {
+            const prefix = this.$store.state.network === "Mainnet"? "": (this.$store.state.network.toLowerCase() + ".")
+            const url = `https://${prefix}etherscan.io/tx/${tx.hash}`
+            var win = window.open(url, '_blank');
+            win.focus();
+          }
+      })
+      await tx.wait(2)
+      this.$store.dispatch('updatePositions')
+      this.$store.dispatch('updateBalances')
+    },
   }
 }
 </script>
