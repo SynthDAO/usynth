@@ -11,17 +11,8 @@
         <b-table-column field="symbol" label="Name">
             {{ s.row.symbol }}
         </b-table-column>
-        <b-table-column field="price" label="Index Price">
-            {{ s.row.price }}
-        </b-table-column>
         <b-table-column field="balance" label="Balance">
             {{ balanceFormat(s.row.synthBalance) }}
-        </b-table-column>
-        <b-table-column field="saferatio" label="GCR">
-            {{ s.row.creq }}%
-        </b-table-column>
-        <b-table-column field="creq" label="C. Req.">
-            {{ s.row.liquidationThresh }}%
         </b-table-column>
         <b-table-column field="action" label="Action">
           <b-dropdown aria-role="list">
