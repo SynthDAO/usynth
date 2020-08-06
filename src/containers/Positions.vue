@@ -139,6 +139,13 @@ export default {
     },
     async redeemExpired(synthName) {
       const synthContract = this.$store.state.synths[synthName].contract
+      const tokenContract = this.$store.state.synths[synthName].tokenContract
+      const balance = await tokenContract.balanceOf(this.$store.state.address)
+      const allowance = await tokenContract.allowance(this.$store.state.address, synthContract.address)
+      if(balance.gt(allowance)) {
+        const approveTx = await tokenContract.approve(synthContract.address, balance)
+        await approveTx.wait()
+      }
       let tx = await synthContract.settleExpired()
       this.$buefy.snackbar.open({
           message: "A redeem request has been submitted",
