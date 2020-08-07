@@ -63,11 +63,12 @@
               <button slot="trigger" slot-scope="{ active }">
                   <b-icon :icon="active ? 'menu-up' : 'menu-down'"></b-icon>
               </button>
-              <b-dropdown-item @click="showMintModal(props.row.name)" aria-role="listitem">Mint</b-dropdown-item>
-              <b-dropdown-item @click="showWithdrawModal(props.index)" aria-role="listitem">Withdraw</b-dropdown-item>
+              <b-dropdown-item v-if="!props.row.isExpired" @click="showMintModal(props.row.name)" aria-role="listitem">Mint</b-dropdown-item>
+              <b-dropdown-item v-if="!props.row.isExpired" @click="showWithdrawModal(props.index)" aria-role="listitem">Withdraw</b-dropdown-item>
               <b-dropdown-item @click="goToPool(props.row.name)" aria-role="listitem">Trade</b-dropdown-item>
               <b-dropdown-item v-if="props.row.withdrawalReady" @click="$emit('confirmWithdrawal', props.row.name)" aria-role="listitem">Complete Withdrawal</b-dropdown-item>
               <b-dropdown-item v-if="props.row.pendingWithdrawal" @click="$emit('cancelWithdrawal', props.row.name)" aria-role="listitem">Cancel Withdrawal</b-dropdown-item>
+              <b-dropdown-item v-if="!props.row.isExpired" @click="showRedeemModal(props.index)" aria-role="listitem">Redeem</b-dropdown-item>
           </b-dropdown>
         </b-table-column>
       </template>
@@ -88,11 +89,12 @@
 <script>
 import Mint from '../components/Mint';
 import Withdraw from '../components/Withdraw';
+import Redeem from '../components/Redeem';
 import { ethers } from 'ethers'
 
 export default {
   name: 'Positions',
-  props:['positions', 'synths', 'authed'],
+  props:['positions', 'synths', 'authed', 'address'],
   computed: {
     synthsArray () {
       return Object.entries(this.synths)
@@ -155,6 +157,27 @@ export default {
         events:{
           withdraw({collateral, synthName}){
             self.$emit('withdraw', {collateral, synthName})
+          }
+        }
+      })
+    },
+    async showRedeemModal(index) {
+      let position = this.positions[index]
+      const synth = this.synths[position.name]
+      position.tokenBalance = await synth.tokenContract.balanceOf(this.address)
+      const self = this
+      this.$buefy.modal.open({
+        parent: this,
+        component: Redeem,
+        trapFocus: true,
+        fullScreen:true,
+        customClass:"modal",
+        props:{
+          ...position
+        },
+        events:{
+          redeem({amount, synthName}){
+            self.$emit('redeem', {amount, synthName})
           }
         }
       })

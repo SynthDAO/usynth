@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Positions @redeemExpired="redeemExpired" @confirmWithdrawal="confirmWithdrawal" @cancelWithdrawal="cancelWithdrawal" @mint="mint" @withdraw="withdraw" :authed="this.$store.state.authed" :positions="positions" :synths="this.$store.state.synths"/>
+    <Positions @redeem="redeem" @redeemExpired="redeemExpired" @confirmWithdrawal="confirmWithdrawal" @cancelWithdrawal="cancelWithdrawal" @mint="mint" @withdraw="withdraw" :address="this.$store.state.address" :authed="this.$store.state.authed" :positions="positions" :synths="this.$store.state.synths"/>
   </div>
 </template>
 
@@ -25,6 +25,7 @@ export default {
         position.liquidationThresh = synth.liquidationThresh
         position.creq = synth.creq
         position.collateralSymbol = synth.collateralSymbol
+        position.isExpired = synth.isExpired
         const BigCollateral = BigNumber(position.collateral.toString())
         const BigAmount = BigNumber(position.amount.toString())
         position.cratio = BigCollateral.div(BigAmount.times(synth.price)).times(100).toFixed(4)
@@ -163,6 +164,32 @@ export default {
       this.$store.dispatch('updatePositions')
       this.$store.dispatch('updateBalances')
     },
+    async redeem({synthName, amount}) {
+      amount = ethers.utils.parseEther(amount)
+      const synthContract = this.$store.state.synths[synthName].contract
+      const tokenContract = this.$store.state.synths[synthName].tokenContract
+      const allowance = await tokenContract.allowance(this.$store.state.address, synthContract.address)
+      if(allowance.lt(amount)) {
+        const approveTx = await tokenContract.approve(synthContract.address, amount)
+        await approveTx.wait()
+      }
+      let tx = await synthContract.redeem([amount])
+      this.$buefy.snackbar.open({
+          message: "A redeem request has been submitted",
+          type: 'is-success',
+          position: 'is-top',
+          actionText: 'Check TX', 
+          onAction: () => {
+            const prefix = this.$store.state.network === "Mainnet"? "": (this.$store.state.network.toLowerCase() + ".")
+            const url = `https://${prefix}etherscan.io/tx/${tx.hash}`
+            var win = window.open(url, '_blank');
+            win.focus();
+          }
+      })
+      await tx.wait(2)
+      this.$store.dispatch('updatePositions')
+      this.$store.dispatch('updateBalances')
+    }
   }
 }
 </script>
