@@ -1,5 +1,31 @@
 <template>
-  <div class="has-text-centered">
+  <div class="page has-text-centered">
+    <div class="title">
+      Synths
+    </div>
+    <div v-if="!authed" class="subtitle">
+      Connect your wallet to see available Synths.
+    </div>
+    <b-table v-if="synthsArray.length > 0" :data="synthsArray">
+      <template slot-scope="s">
+        <b-table-column field="symbol" label="Name">
+            {{ s.row.symbol }}
+        </b-table-column>
+        <b-table-column field="balance" label="Balance">
+            {{ balanceFormat(s.row.synthBalance) }}
+        </b-table-column>
+        <b-table-column field="action" label="Action">
+          <b-dropdown aria-role="list">
+            <button slot="trigger" slot-scope="{ active }">
+                <b-icon :icon="active ? 'menu-up' : 'menu-down'"></b-icon>
+            </button>
+            <b-dropdown-item @click="showMintModal(s.row.name)" aria-role="listitem">Mint</b-dropdown-item>
+            <b-dropdown-item @click="goToPool(s.row.name)" aria-role="listitem">Trade</b-dropdown-item>
+            <b-dropdown-item v-if="s.row.isExpired" @click="$emit('redeemExpired', s.row.name)" aria-role="listitem">Redeem Expired</b-dropdown-item>
+          </b-dropdown>
+        </b-table-column>
+      </template>
+    </b-table>
     <div class="title">
       My Positions
     </div>
@@ -37,11 +63,12 @@
               <button slot="trigger" slot-scope="{ active }">
                   <b-icon :icon="active ? 'menu-up' : 'menu-down'"></b-icon>
               </button>
-              <b-dropdown-item @click="showMintModal(props.row.name)" aria-role="listitem">Mint</b-dropdown-item>
-              <b-dropdown-item @click="showWithdrawModal(props.index)" aria-role="listitem">Withdraw</b-dropdown-item>
+              <b-dropdown-item v-if="!props.row.isExpired" @click="showMintModal(props.row.name)" aria-role="listitem">Mint</b-dropdown-item>
+              <b-dropdown-item v-if="!props.row.isExpired" @click="showWithdrawModal(props.index)" aria-role="listitem">Withdraw</b-dropdown-item>
               <b-dropdown-item @click="goToPool(props.row.name)" aria-role="listitem">Trade</b-dropdown-item>
               <b-dropdown-item v-if="props.row.withdrawalReady" @click="$emit('confirmWithdrawal', props.row.name)" aria-role="listitem">Complete Withdrawal</b-dropdown-item>
               <b-dropdown-item v-if="props.row.pendingWithdrawal" @click="$emit('cancelWithdrawal', props.row.name)" aria-role="listitem">Cancel Withdrawal</b-dropdown-item>
+              <b-dropdown-item v-if="!props.row.isExpired" @click="showRedeemModal(props.index)" aria-role="listitem">Redeem</b-dropdown-item>
           </b-dropdown>
         </b-table-column>
       </template>
@@ -62,39 +89,21 @@
 <script>
 import Mint from '../components/Mint';
 import Withdraw from '../components/Withdraw';
+import Redeem from '../components/Redeem';
 import { ethers } from 'ethers'
 
 export default {
   name: 'Positions',
-  props:['positions', 'synths', 'authed'],
-  data () {
-    return {
-      columns: [
-        {
-            field: 'name',
-            label: 'Name',
-        },
-        {
-            field: 'amount',
-            label: 'Amount',
-        },
-        {
-            field: 'collateral',
-            label: 'Collateral',
-        },
-        {
-            field: 'cratio',
-            label: 'C. Ratio',
-        },
-        {
-            field: 'creq',
-            label: 'C. Req.',
-        },
-        {
-            field: 'pending',
-            label: 'Pending',
-        }
-      ]
+  props:['positions', 'synths', 'authed', 'address'],
+  computed: {
+    synthsArray () {
+      return Object.entries(this.synths)
+        .map((synth) => {
+          let name = synth[0]
+          synth = synth[1]
+          synth.name = name
+          return synth
+        })
     }
   },
   methods:{
@@ -152,13 +161,38 @@ export default {
         }
       })
     },
+    async showRedeemModal(index) {
+      let position = this.positions[index]
+      const synth = this.synths[position.name]
+      position.tokenBalance = await synth.tokenContract.balanceOf(this.address)
+      const self = this
+      this.$buefy.modal.open({
+        parent: this,
+        component: Redeem,
+        trapFocus: true,
+        fullScreen:true,
+        customClass:"modal",
+        props:{
+          ...position
+        },
+        events:{
+          redeem({amount, synthName}){
+            self.$emit('redeem', {amount, synthName})
+          }
+        }
+      })
+    },
     goToPool(synthKey) {
       const synth = this.synths[synthKey]
       var win = window.open(synth.pool, '_blank');
       win.focus();
     },
     balanceFormat(baseUnit) {
-      return ethers.utils.formatEther(baseUnit)
+      try {
+        return ethers.utils.formatEther(baseUnit)
+      } catch(e) {
+        return 0
+      }
     },
   }
 }
@@ -166,8 +200,8 @@ export default {
 
 <style lang="scss" scoped>
 .title {
-  margin-top:100px;
-  margin-bottom:100px !important;
+  margin-top:50px;
+  margin-bottom:50px !important;
 }
 .subtitle {
   margin-bottom:100px !important;
@@ -187,5 +221,8 @@ export default {
     text-align: center;
     padding: 20px;
     background:#f9fafb;
+}
+.page {
+  padding-bottom:88px;
 }
 </style>
