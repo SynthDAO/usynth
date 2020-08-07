@@ -1,5 +1,5 @@
 <template>
-  <div class="has-text-centered">
+  <div class="page has-text-centered">
     <div class="title">
       Synths
     </div>
@@ -221,5 +221,8 @@ export default {
     text-align: center;
     padding: 20px;
     background:#f9fafb;
+}
+.page {
+  padding-bottom:88px;
 }
 </style>
