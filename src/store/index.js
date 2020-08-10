@@ -49,18 +49,20 @@ export default new Vuex.Store({
     async updatePositions (context) {
       let positions = []
       for (let synth in context.state.synths) {
-        let contractPositions = await context.state.synths[synth].contract.positions(context.state.address)
-        for (let i = 0; i < contractPositions.tokensOutstanding.length; i++) {
-          if(contractPositions.tokensOutstanding[i].gt(0)) {
-            positions.push({
-              name:synth,
-              symbol: context.state.synths[synth].symbol,
-              tokensOutstanding: contractPositions.tokensOutstanding[i],
-              requestPassTimestamp:contractPositions.requestPassTimestamp,
-              withdrawalRequestAmount:contractPositions.withdrawalRequestAmount[i],
-              rawCollateral:contractPositions.rawCollateral[i],
-              transferPositionRequestPassTimestamp:contractPositions.transferPositionRequestPassTimestamp
-            })
+        if(!context.state.synths[synth].isExpired) {
+          let contractPositions = await context.state.synths[synth].contract.positions(context.state.address)
+          for (let i = 0; i < contractPositions.tokensOutstanding.length; i++) {
+            if(contractPositions.tokensOutstanding[i].gt(0)) {
+              positions.push({
+                name:synth,
+                symbol: context.state.synths[synth].symbol,
+                tokensOutstanding: contractPositions.tokensOutstanding[i],
+                requestPassTimestamp:contractPositions.requestPassTimestamp,
+                withdrawalRequestAmount:contractPositions.withdrawalRequestAmount[i],
+                rawCollateral:contractPositions.rawCollateral[i],
+                transferPositionRequestPassTimestamp:contractPositions.transferPositionRequestPassTimestamp
+              })
+            }
           }
         }
       }
