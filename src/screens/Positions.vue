@@ -74,10 +74,10 @@
       </template>
     </b-table>
     <b-dropdown aria-role="list">
-        <button :disabled="Object.keys(synths).length === 0" class="button is-primary" size="is-medium" slot="trigger">
+        <button :disabled="Object.keys(unexpiredSynths).length === 0" class="button is-primary" size="is-medium" slot="trigger">
             Mint a Synth
         </button>
-        <b-dropdown-item v-for="(synth, key) in synths" :key="key" @click='showMintModal(key)' aria-role="listitem">{{synth.symbol}}</b-dropdown-item>
+        <b-dropdown-item v-for="(synth, key) in unexpiredSynths" :key="key" @click='showMintModal(key)' aria-role="listitem">{{synth.symbol}}</b-dropdown-item>
     </b-dropdown>
     <footer class="footer">
       <p><a href="https://github.com/SynthDAO/usynth">Github</a> | <a href="https://discord.gg/CfX6rdS">Discord</a> | <a href="https://docs.umaproject.org/synthetic-tokens/explainer/">UMA Synths</a></p>
@@ -104,6 +104,15 @@ export default {
           synth.name = name
           return synth
         })
+    },
+    unexpiredSynths () {
+      const result = {}
+      for (const prop in this.synths) {
+        if(!this.synths[prop].isExpired) {
+          result[prop] = this.synths[prop]
+        }
+      }
+      return result
     }
   },
   methods:{
