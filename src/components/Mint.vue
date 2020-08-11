@@ -98,7 +98,12 @@
 
         <section>
             <b-field label="Deposit Collateral">
-                <b-input v-model="collateralAmount" :placeholder="'Deposit ' + collateralSymbol"></b-input>
+                <b-field>
+                    <b-input v-model="collateralAmount" :placeholder="'Deposit ' + collateralSymbol" expanded></b-input>
+                    <p class="control">
+                        <b-button @click="maxCollateral" class="button">MAX</b-button>
+                    </p>
+                </b-field>
             </b-field>
             <div class="balance">
                 <div class="is-pulled-left">
@@ -106,7 +111,12 @@
                 </div>
             </div>
             <b-field label="Mint Synth">
-                <b-input v-model="synthAmount" :placeholder="'Mint ' + symbol"></b-input>
+                <b-field>
+                    <b-input v-model="synthAmount" :placeholder="'Mint ' + symbol" expanded></b-input>
+                    <p class="control">
+                        <b-button @click="maxSynth" class="button">MAX</b-button>
+                    </p>
+                </b-field>
             </b-field>
             <div class="balance">
                 <div class="is-pulled-left">
@@ -141,10 +151,17 @@ export default {
   },
   methods:{
       timeFormat (timestamp) {
-          return (new Date(timestamp*1000)).toUTCString()
+            return (new Date(timestamp*1000)).toUTCString()
       },
       balanceFormat(baseUnit) {
-          return ethers.utils.formatEther(baseUnit)
+            return ethers.utils.formatEther(baseUnit)
+      },
+      maxCollateral () {
+            this.collateralAmount = this.balanceFormat(this.collateralBalance)
+      },
+      maxSynth () {
+            if(isNaN(this.collateralAmount)) return
+            this.synthAmount = (this.collateralAmount / this.price) / (this.creq * 0.01)
       },
       mint() {
         this.$emit('mint', {
