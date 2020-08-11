@@ -74,9 +74,9 @@
       </template>
     </b-table>
     <b-dropdown aria-role="list">
-        <button :disabled="Object.keys(unexpiredSynths).length === 0" class="button is-primary" size="is-medium" slot="trigger">
+        <b-button :loading="loading" :disabled="Object.keys(unexpiredSynths).length === 0" class="button is-primary" size="is-medium" slot="trigger">
             Mint a Synth
-        </button>
+        </b-button>
         <b-dropdown-item v-for="(synth, key) in unexpiredSynths" :key="key" @click='showMintModal(key)' aria-role="listitem">{{synth.symbol}}</b-dropdown-item>
     </b-dropdown>
     <footer class="footer">
@@ -94,7 +94,7 @@ import { ethers } from 'ethers'
 
 export default {
   name: 'Positions',
-  props:['positions', 'synths', 'authed', 'address'],
+  props:['positions', 'synths', 'authed', 'address', 'loading'],
   computed: {
     synthsArray () {
       return Object.entries(this.synths)

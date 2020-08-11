@@ -6,6 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     authed:false,
+    loading:false,
     address:"",
     network:"",
     wallet:{},
@@ -18,9 +19,11 @@ export default new Vuex.Store({
       state.network = network
       state.wallet = wallet
       state.authed = true
+      state.loading = true
     },
     init (state, synths) {
       state.synths = synths
+      state.loading = false
     },
     updateBalances (state, synthBalances) {
       let synths = Object.assign({}, state.synths)

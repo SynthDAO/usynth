@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Positions @redeem="redeem" @redeemExpired="redeemExpired" @confirmWithdrawal="confirmWithdrawal" @cancelWithdrawal="cancelWithdrawal" @mint="mint" @withdraw="withdraw" :address="this.$store.state.address" :authed="this.$store.state.authed" :positions="positions" :synths="this.$store.state.synths"/>
+    <Positions @redeem="redeem" @redeemExpired="redeemExpired" @confirmWithdrawal="confirmWithdrawal" @cancelWithdrawal="cancelWithdrawal" @mint="mint" @withdraw="withdraw" :loading="this.$store.state.loading" :address="this.$store.state.address" :authed="this.$store.state.authed" :positions="positions" :synths="this.$store.state.synths"/>
   </div>
 </template>
 
