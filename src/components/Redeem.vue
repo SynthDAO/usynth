@@ -5,11 +5,16 @@
         </div>
         <section>
             <b-field label="Amount to Redeem">
-                <b-input v-model="tokenAmount" :placeholder="symbol"></b-input>
+                <b-field>
+                    <b-input v-model="tokenAmount" :placeholder="symbol" expanded></b-input>
+                    <p class="control">
+                        <b-button @click="max" class="button">MAX</b-button>
+                    </p>
+                </b-field>
             </b-field>
             <div class="balance">
                 <div class="is-pulled-left">
-                    Current Position: {{balanceFormat(tokenBalance)}} {{symbol}}
+                    Current Position: {{balanceFormat(tokensOutstanding)}} {{symbol}}
                 </div>
             </div>
             <div class="level item">
@@ -57,7 +62,7 @@
 import { ethers } from 'ethers';
 export default {
   name: 'Redeem',
-  props:['name', 'symbol', 'collateral', 'amount', 'collateralSymbol', 'cratio', 'tokenBalance'],
+  props:['name', 'symbol', 'collateral', 'amount', 'collateralSymbol', 'cratio', 'tokensOutstanding'],
   data: () => {
       return {
           tokenAmount:""
@@ -73,16 +78,19 @@ export default {
             synthName:this.name
         })
         this.$emit('close')
+    },
+    max () {
+        this.tokenAmount = this.balanceFormat(this.tokensOutstanding)
     }
   },
   computed: {
     collateralRedeeming () {
         if(this.disabled) return "0"
-        return this.collateral.div(this.tokenBalance.div(ethers.utils.parseEther(this.tokenAmount)))
+        return this.collateral.div(this.tokensOutstanding.div(ethers.utils.parseEther(this.tokenAmount)))
     },
     disabled () {
         if(isNaN(this.tokenAmount)) return true
-        if(this.tokenAmount > parseInt(this.balanceFormat(this.tokenBalance))) return true
+        if(this.tokenAmount > parseInt(this.balanceFormat(this.tokensOutstanding))) return true
         if(this.tokenAmount.length === 0) return true
         if(this.tokenAmount == 0) return true
         return false
