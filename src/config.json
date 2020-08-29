@@ -21,6 +21,11 @@
                 "address":"0xb56C5f1fB93b1Fbd7c473926c87B6B9c4d0e21d5",	
                 "pool":"https://balancer.exchange/#/swap/0x81ab848898b5ffd3354dbbefb333d5d183eedcb5/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                 "invertedPrice":true	
+            },
+            "USD/ETH":{	
+                "address":"0xB2FdD60AD80ca7bA89B9BAb3b5336c2601C020b4",	
+                "pool":"https://balancer.exchange/#/swap/0xB2FdD60AD80ca7bA89B9BAb3b5336c2601C020b4/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "invertedPrice":true	
             }
         }
     }
